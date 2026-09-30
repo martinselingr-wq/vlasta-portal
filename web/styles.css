@@ -412,12 +412,13 @@ body {
 .margin-bottom-sm { margin-bottom: 12px; }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
-/* Date Input Styling & Custom Highlighted Calendar Icon */
-input[type="date"] {
+/* Date & Time Input Styling & Custom Highlighted Picker Icon */
+input[type="date"], input[type="time"] {
   position: relative;
   color-scheme: dark;
 }
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   border-radius: 6px;
   background-color: rgba(6, 182, 212, 0.2);
@@ -427,7 +428,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: 1px solid rgba(6, 182, 212, 0.5);
   transition: all 0.2s ease;
 }
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
   background-color: rgba(6, 182, 212, 0.45);
   border-color: var(--accent-cyan);
   box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
