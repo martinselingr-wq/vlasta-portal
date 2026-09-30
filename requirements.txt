@@ -1,2 +1,2 @@
-# VLASTA Web Server uses Python standard library (http.server, json, socketserver)
-# No external pip dependencies required.
+flask>=3.0.0
+gunicorn>=21.2.0
