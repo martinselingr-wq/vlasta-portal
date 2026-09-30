@@ -431,6 +431,25 @@ function renderClipTable(items) {
   tbody.innerHTML = html;
 }
 
+function filterClipTable() {
+  const q = (document.getElementById('filter-clip-input')?.value || '').toLowerCase().trim();
+  const rawList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  if (!q) {
+    renderClipTable(rawList);
+    return;
+  }
+  const filtered = rawList.filter(c => 
+    (c.code && c.code.toLowerCase().includes(q)) ||
+    (c.name && c.name.toLowerCase().includes(q)) ||
+    (c.udi_di && c.udi_di.toLowerCase().includes(q)) ||
+    (c.lot && c.lot.toLowerCase().includes(q)) ||
+    (c.ref && c.ref.toLowerCase().includes(q)) ||
+    (c.location && c.location.toLowerCase().includes(q)) ||
+    (c.id && String(c.id).includes(q))
+  );
+  renderClipTable(filtered);
+}
+
 function openClipModal(clipId = null) {
   const modal = document.getElementById('clip-modal');
   if (!modal) return;
@@ -536,6 +555,25 @@ function renderAccessoriesTable(items) {
     `;
   });
   tbody.innerHTML = html;
+}
+
+function filterAccessoriesTable() {
+  const q = (document.getElementById('filter-acc-input')?.value || '').toLowerCase().trim();
+  const rawList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  if (!q) {
+    renderAccessoriesTable(rawList);
+    return;
+  }
+  const filtered = rawList.filter(a => 
+    (a.code && a.code.toLowerCase().includes(q)) ||
+    (a.name && a.name.toLowerCase().includes(q)) ||
+    (a.udi_di && a.udi_di.toLowerCase().includes(q)) ||
+    (a.lot && a.lot.toLowerCase().includes(q)) ||
+    (a.ref && a.ref.toLowerCase().includes(q)) ||
+    (a.location && a.location.toLowerCase().includes(q)) ||
+    (a.id && String(a.id).includes(q))
+  );
+  renderAccessoriesTable(filtered);
 }
 
 function openAccessoryModal(accId = null) {
