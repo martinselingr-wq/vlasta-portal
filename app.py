@@ -167,14 +167,14 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <div class="cb-pane" id="cb-pane-clip">
           <div class="grid-card">
             <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-clip"></tbody></table></div></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-clip"></tbody></table></div></div>
           </div>
         </div>
 
         <div class="cb-pane" id="cb-pane-accessories">
           <div class="grid-card">
             <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
           </div>
         </div>
       </section>
@@ -317,6 +317,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
           <div class="form-group margin-bottom-sm"><label>REF</label><input type="text" id="clip-ref" class="modal-input" placeholder="CDS0802-XTW"></div>
         </div>
         <div class="form-group margin-bottom-sm"><label>Expirace</label><input type="date" id="clip-expiry" class="modal-input"></div>
+        <div class="form-group margin-bottom-sm"><label>Sklad (Nemocnice / Technik)</label><select id="clip-location" class="modal-input"></select></div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeClipModal()">Zrušit</button>
@@ -341,6 +342,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
           <div class="form-group margin-bottom-sm"><label>REF</label><input type="text" id="acc-ref" class="modal-input" placeholder="1458Q-86"></div>
         </div>
         <div class="form-group margin-bottom-sm"><label>Expirace</label><input type="date" id="acc-expiry" class="modal-input"></div>
+        <div class="form-group margin-bottom-sm"><label>Sklad (Nemocnice / Technik)</label><select id="acc-location" class="modal-input"></select></div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeAccessoryModal()">Zrušit</button>
@@ -349,7 +351,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
 """
@@ -637,37 +639,175 @@ function deleteHospital(hospId) {
   .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
-function renderMaterialTable(items) {
-  const tbody = document.getElementById('cb-table-material');
+function populateLocationDropdown(selectId, selectedValue = '') {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const hospitals = (vlastaData.codebooks && vlastaData.codebooks.hospitals) || [];
+  const technicians = (vlastaData.codebooks && vlastaData.codebooks.technicians) || [];
+  let html = '<option value="Hlavní sklad CARDION">Hlavní sklad CARDION</option>';
+  if (hospitals.length > 0) {
+    html += '<optgroup label="🏥 Nemocnice & Kardiocentra">';
+    hospitals.forEach(h => { if (h.name) html += `<option value="${h.name}">${h.name}</option>`; });
+    html += '</optgroup>';
+  }
+  if (technicians.length > 0) {
+    html += '<optgroup label="👤 Technici">';
+    technicians.forEach(t => { if (t.name) html += `<option value="${t.name}">${t.name}</option>`; });
+    html += '</optgroup>';
+  }
+  select.innerHTML = html;
+  if (selectedValue) select.value = selectedValue;
+}
+
+function renderClipTable(items) {
+  const tbody = document.getElementById('cb-table-clip');
   if (!tbody) return;
-  if (!items.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádný materiál.</td></tr>'; return; }
+  if (!items || !items.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Žádné clipy.</td></tr>'; return; }
   let html = '';
-  items.forEach(m => { html += `<tr><td>#${m.id}</td><td><strong>${m.code}</strong></td><td>${m.name}</td><td><span class="badge-vlasta">${m.category}</span></td><td>${m.supplier}</td><td>${m.warranty_months} měs.</td></tr>`; });
+  items.forEach(c => {
+    const locBadge = c.location ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-solid fa-warehouse"></i> ${c.location}</span>` : '-';
+    html += `<tr><td>#${c.id}</td><td><strong>${c.code || '-'}</strong></td><td>${c.name || '-'}</td><td><span class="badge-vlasta">${c.udi_di || '-'}</span></td><td>${c.lot || '-'}</td><td>${c.ref || '-'}</td><td>${c.expiry || '-'}</td><td>${locBadge}</td><td style="text-align: right;"><button class="btn-secondary btn-sm" onclick="showEditClipModal(${c.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button> <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteClip(${c.id})"><i class="fa-solid fa-trash"></i> Smazat</button></td></tr>`;
+  });
   tbody.innerHTML = html;
+}
+
+function openClipModal(clipId = null) {
+  const modal = document.getElementById('clip-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('clip-modal-title');
+  document.getElementById('clip-id').value = clipId || '';
+  let currentLoc = '';
+  if (clipId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-heart-pulse"></i> Úprava Clip Materiálu';
+    const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+    const item = clipList.find(c => c.id === clipId);
+    if (item) {
+      document.getElementById('clip-code').value = item.code || '';
+      document.getElementById('clip-name').value = item.name || '';
+      document.getElementById('clip-udi-di').value = item.udi_di || '';
+      document.getElementById('clip-lot').value = item.lot || '';
+      document.getElementById('clip-ref').value = item.ref || '';
+      document.getElementById('clip-expiry').value = item.expiry || '';
+      currentLoc = item.location || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plus"></i> Přidat Clip Materiál';
+    document.getElementById('clip-code').value = '';
+    document.getElementById('clip-name').value = '';
+    document.getElementById('clip-udi-di').value = '';
+    document.getElementById('clip-lot').value = '';
+    document.getElementById('clip-ref').value = '';
+    document.getElementById('clip-expiry').value = '';
+  }
+  populateLocationDropdown('clip-location', currentLoc);
+  modal.style.display = 'flex';
+}
+
+function showEditClipModal(clipId) { openClipModal(clipId); }
+function closeClipModal() { const modal = document.getElementById('clip-modal'); if (modal) modal.style.display = 'none'; }
+
+function saveClipModal() {
+  const clipId = document.getElementById('clip-id').value;
+  const code = document.getElementById('clip-code').value.trim();
+  const name = document.getElementById('clip-name').value.trim();
+  const udi_di = document.getElementById('clip-udi-di').value.trim();
+  const lot = document.getElementById('clip-lot').value.trim();
+  const ref = document.getElementById('clip-ref').value.trim();
+  const expiry = document.getElementById('clip-expiry').value;
+  const location = document.getElementById('clip-location').value;
+  if (!name) { alert('Zadejte prosím název materiálu.'); return; }
+  const itemData = { code, name, udi_di, lot, ref, expiry, location };
+  const action = clipId ? 'edit' : 'add';
+  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, type: 'clip', id: clipId ? parseInt(clipId) : null, data: itemData }) })
+  .then(r => r.json()).then(() => { closeClipModal(); loadVlastaCodebooks(); });
+}
+
+function deleteClip(clipId) {
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+  const item = clipList.find(c => c.id === clipId);
+  const itemName = item ? item.name : `#${clipId}`;
+  if (!confirm(`Opravdu si přejete smazat položku ${itemName}?`)) return;
+  fetch(`/api/vlasta/codebooks`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'clip', id: clipId }) })
+  .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
 function renderAccessoriesTable(items) {
   const tbody = document.getElementById('cb-table-accessories');
   if (!tbody) return;
-  if (!items.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádné příslušenství.</td></tr>'; return; }
+  if (!items || !items.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Žádné příslušenství.</td></tr>'; return; }
   let html = '';
-  items.forEach(a => { html += `<tr><td>#${a.id}</td><td><strong>${a.code}</strong></td><td>${a.name}</td><td><span class="badge-vlasta">${a.category}</span></td><td>${a.compat}</td><td>${a.stock_min} ks</td></tr>`; });
+  items.forEach(a => {
+    const locBadge = a.location ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-solid fa-warehouse"></i> ${a.location}</span>` : '-';
+    html += `<tr><td>#${a.id}</td><td><strong>${a.code || '-'}</strong></td><td>${a.name || '-'}</td><td><span class="badge-vlasta">${a.udi_di || '-'}</span></td><td>${a.lot || '-'}</td><td>${a.ref || '-'}</td><td>${a.expiry || '-'}</td><td>${locBadge}</td><td style="text-align: right;"><button class="btn-secondary btn-sm" onclick="showEditAccessoryModal(${a.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button> <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteAccessory(${a.id})"><i class="fa-solid fa-trash"></i> Smazat</button></td></tr>`;
+  });
   tbody.innerHTML = html;
+}
+
+function openAccessoryModal(accId = null) {
+  const modal = document.getElementById('accessory-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('acc-modal-title');
+  document.getElementById('acc-id').value = accId || '';
+  let currentLoc = '';
+  if (accId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plug-circle-bolt"></i> Úprava Příslušenství';
+    const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+    const item = accList.find(a => a.id === accId);
+    if (item) {
+      document.getElementById('acc-code').value = item.code || '';
+      document.getElementById('acc-name').value = item.name || '';
+      document.getElementById('acc-udi-di').value = item.udi_di || '';
+      document.getElementById('acc-lot').value = item.lot || '';
+      document.getElementById('acc-ref').value = item.ref || '';
+      document.getElementById('acc-expiry').value = item.expiry || '';
+      currentLoc = item.location || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plus"></i> Přidat Příslušenství';
+    document.getElementById('acc-code').value = '';
+    document.getElementById('acc-name').value = '';
+    document.getElementById('acc-udi-di').value = '';
+    document.getElementById('acc-lot').value = '';
+    document.getElementById('acc-ref').value = '';
+    document.getElementById('acc-expiry').value = '';
+  }
+  populateLocationDropdown('acc-location', currentLoc);
+  modal.style.display = 'flex';
+}
+
+function showEditAccessoryModal(accId) { openAccessoryModal(accId); }
+function closeAccessoryModal() { const modal = document.getElementById('accessory-modal'); if (modal) modal.style.display = 'none'; }
+
+function saveAccessoryModal() {
+  const accId = document.getElementById('acc-id').value;
+  const code = document.getElementById('acc-code').value.trim();
+  const name = document.getElementById('acc-name').value.trim();
+  const udi_di = document.getElementById('acc-udi-di').value.trim();
+  const lot = document.getElementById('acc-lot').value.trim();
+  const ref = document.getElementById('acc-ref').value.trim();
+  const expiry = document.getElementById('acc-expiry').value;
+  const location = document.getElementById('acc-location').value;
+  if (!name) { alert('Zadejte prosím název příslušenství.'); return; }
+  const itemData = { code, name, udi_di, lot, ref, expiry, location };
+  const action = accId ? 'edit' : 'add';
+  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, type: 'accessories', id: accId ? parseInt(accId) : null, data: itemData }) })
+  .then(r => r.json()).then(() => { closeAccessoryModal(); loadVlastaCodebooks(); });
+}
+
+function deleteAccessory(accId) {
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+  const item = accList.find(a => a.id === accId);
+  const itemName = item ? item.name : `#${accId}`;
+  if (!confirm(`Opravdu si přejete smazat položku ${itemName}?`)) return;
+  fetch(`/api/vlasta/codebooks`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'accessories', id: accId }) })
+  .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
 function showAddCodebookModal(cbType) {
   if (cbType === 'technicians') { openTechnicianModal(null); return; }
   if (cbType === 'hospitals') { openHospitalModal(null); return; }
-  const labels = { material: 'Materiál', accessories: 'Příslušenství' };
-  const val = prompt(`Přidat záznam do číselníku pro ${labels[cbType] || cbType}:\nZadejte hodnoty oddělené čárkou.`);
-  if (!val) return;
-  const parts = val.split(',').map(p => p.trim());
-  let itemData = {};
-  if (cbType === 'material') { itemData = { code: parts[0] || 'MAT-001', name: parts[1] || 'Nový Materiál', category: parts[2] || 'ICD', supplier: parts[3] || 'CARDION', warranty_months: 72 }; }
-  else if (cbType === 'accessories') { itemData = { code: parts[0] || 'ACC-001', name: parts[1] || 'Nové Příslušenství', category: parts[2] || 'Elektrody', compat: parts[3] || 'Univerzální', stock_min: 10 }; }
-
-  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'add', type: cbType, data: itemData }) })
-  .then(r => r.json()).then(() => loadVlastaCodebooks());
+  if (cbType === 'clip') { openClipModal(null); return; }
+  if (cbType === 'accessories') { openAccessoryModal(null); return; }
 }
 
 function renderDashboardStats() {
