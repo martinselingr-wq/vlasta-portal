@@ -7,6 +7,7 @@ window.switchTab = function(tabKey) {
   const titlesMap = {
     dashboard: { title: 'Hlavní Přehled', subtitle: 'Přehledná správa a řízení projektu VLASTA' },
     items: { title: 'Evidované Položky', subtitle: 'Detailní seznam všech položek v databázi VLASTA' },
+    implantations: { title: 'Implantace', subtitle: 'Evidence realizovaných zákroků MitraClip a TriClip' },
     codebooks: { title: 'Číselníky', subtitle: 'Správa kmenových dat: Technici, Nemocnice, Materiál, Příslušenství' },
     voice: { title: 'Hlasový Asistent Vlasta AI', subtitle: 'Zadávání a zpracování příkazů pomocí hlasového rozhraní' },
     analytics: { title: 'Analytika & Statistiky', subtitle: 'Systémový rozpad dat a přehledy aktivních kategorií' }
@@ -29,6 +30,9 @@ window.switchTab = function(tabKey) {
 
   if (tabKey === 'codebooks') {
     loadVlastaCodebooks();
+  }
+  if (tabKey === 'implantations') {
+    loadImplantations();
   }
 };
 
@@ -67,11 +71,13 @@ function loadVlastaCodebooks() {
   .then(r => r.json())
   .then(data => {
     vlastaData.codebooks = data || {};
+    if (data.implantations) vlastaData.implantations = data.implantations;
     renderTechniciansTable(data.technicians || []);
     renderHospitalsTable(data.hospitals || []);
     renderClipTable(data.clip || data.material || []);
     renderAccessoriesTable(data.accessories || []);
     renderItemsTable();
+    renderImplantationsTable();
     renderDashboardStats();
   })
   .catch(err => {
@@ -894,5 +900,317 @@ function processVlastaVoiceCommand() {
 document.addEventListener('DOMContentLoaded', () => {
   loadVlastaData();
   loadVlastaCodebooks();
+  loadImplantations();
 });
+
+// IMPLANTATIONS LOGIC
+function loadImplantations() {
+  fetch('/api/vlasta/implantations')
+  .then(r => r.json())
+  .then(data => {
+    if (data && data.implantations) {
+      vlastaData.implantations = data.implantations;
+    }
+    renderImplantationsTable();
+  })
+  .catch(err => {
+    console.error('Chyba při načítání implantací:', err);
+    renderImplantationsTable();
+  });
+}
+
+function renderImplantationsTable() {
+  const tbody = document.getElementById('implantations-table-body');
+  if (!tbody) return;
+
+  const list = vlastaData.implantations || [];
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Žádné realizované implantace.</td></tr>';
+    return;
+  }
+
+  let html = '';
+  list.forEach(imp => {
+    const mitra = imp.mitraclip_name || '-';
+    const tri = imp.triclip_name || '-';
+    
+    html += `
+      <tr>
+        <td>
+          <a href="#" onclick="openImplantationDetailModal('${imp.id}'); return false;" style="color:#38bdf8; font-weight:700; text-decoration:underline;">
+            <i class="fa-solid fa-notes-medical"></i> ${imp.id}
+          </a>
+        </td>
+        <td><strong>${imp.date}</strong></td>
+        <td>${imp.hospital || '-'}</td>
+        <td><span style="color:#06b6d4; font-weight:600;">${mitra}</span></td>
+        <td><span style="color:#10b981; font-weight:600;">${tri}</span></td>
+        <td style="text-align: right;">
+          <button class="btn-sm btn-secondary" onclick="openImplantationDetailModal('${imp.id}')"><i class="fa-solid fa-eye"></i> Detail</button>
+          <button class="btn-sm btn-secondary" style="color:#ef4444;" onclick="deleteImplantation('${imp.id}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function openImplantationDetailModal(impId) {
+  const list = vlastaData.implantations || [];
+  const imp = list.find(i => i.id === impId);
+  if (!imp) return;
+
+  const modal = document.getElementById('implantation-detail-modal');
+  const title = document.getElementById('imp-detail-title');
+  const body = document.getElementById('imp-detail-body');
+
+  title.innerHTML = `<i class="fa-solid fa-notes-medical" style="color:#38bdf8;"></i> Detail Implantace ${imp.id}`;
+
+  const accStr = (imp.accessories && imp.accessories.length > 0) ? imp.accessories.join(', ') : 'Žádné příslušenství nepoužito';
+
+  body.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">ID Implantace:</span>
+        <div style="font-weight: 700; color: #38bdf8; font-size: 16px;">${imp.id}</div>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">Datum a Čas Zákroku:</span>
+        <div style="font-weight: 600;">${imp.date} (${imp.time_from || '-'} až ${imp.time_to || '-'})</div>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">Nemocnice:</span>
+        <div style="font-weight: 600; color: #f59e0b;">${imp.hospital || '-'}</div>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">Pacient (Pohlaví / Narození):</span>
+        <div style="font-weight: 600;">${imp.gender || '-'} | Nar: ${imp.birth_date || '-'}</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 15px; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <div style="margin-bottom: 10px;">
+        <span style="color: var(--text-muted); font-size: 12px;">Použitý MitraClip:</span>
+        <div style="font-weight: 600; color: #06b6d4;">${imp.mitraclip_name || 'Žádný'}</div>
+      </div>
+      <div style="margin-bottom: 10px;">
+        <span style="color: var(--text-muted); font-size: 12px;">Použitý TriClip:</span>
+        <div style="font-weight: 600; color: #10b981;">${imp.triclip_name || 'Žádný'}</div>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">Použité Příslušenství:</span>
+        <div style="font-weight: 500; color: #cbd5e1;">${accStr}</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 15px; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <div style="margin-bottom: 10px;">
+        <span style="color: var(--text-muted); font-size: 12px;">Indikace Zákroku:</span>
+        <div style="font-weight: 600;">${imp.indication || '-'}</div>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); font-size: 12px;">Umístění / Anatomie:</span>
+        <div style="font-weight: 600; color: #a855f7;">${imp.location || '-'}</div>
+      </div>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+function closeImplantationDetailModal() {
+  const modal = document.getElementById('implantation-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openNewImplantationModal() {
+  const modal = document.getElementById('new-implantation-modal');
+  if (!modal) return;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('imp-date').value = todayStr;
+  document.getElementById('imp-time-from').value = '09:00';
+  document.getElementById('imp-time-to').value = '11:30';
+  document.getElementById('imp-gender').value = 'Muž';
+  document.getElementById('imp-birth-date').value = '1960-01-01';
+  document.getElementById('imp-indication').value = '';
+  document.getElementById('imp-location').value = '';
+
+  // Populate hospitals
+  const hospSelect = document.getElementById('imp-hospital');
+  const hospitals = (vlastaData.codebooks && vlastaData.codebooks.hospitals) || vlastaData.hospitals || [];
+  let hospHtml = '<option value="">-- Vyberte nemocnici --</option>';
+  hospitals.forEach(h => {
+    hospHtml += `<option value="${h.name}">${h.name} (${h.city || ''})</option>`;
+  });
+  hospSelect.innerHTML = hospHtml;
+
+  // Populate MitraClip
+  const mitraclipSelect = document.getElementById('imp-mitraclip');
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  let mitraHtml = '<option value="">-- Žádný MitraClip --</option>';
+  clipList.filter(c => c.name.toLowerCase().includes('mitraclip') || c.code.toLowerCase().includes('cds')).forEach(c => {
+    const qty = parseInt(c.quantity) || 1;
+    mitraHtml += `<option value="${c.id}">${c.name} (Kód: ${c.code}, Sklad: ${c.location}, Skupina: ${qty} ks)</option>`;
+  });
+  mitraclipSelect.innerHTML = mitraHtml;
+
+  // Populate TriClip
+  const triclipSelect = document.getElementById('imp-triclip');
+  let triHtml = '<option value="">-- Žádný TriClip --</option>';
+  clipList.filter(c => c.name.toLowerCase().includes('triclip') || c.code.toLowerCase().includes('tcds')).forEach(c => {
+    const qty = parseInt(c.quantity) || 1;
+    triHtml += `<option value="${c.id}">${c.name} (Kód: ${c.code}, Sklad: ${c.location}, Skupina: ${qty} ks)</option>`;
+  });
+  triclipSelect.innerHTML = triHtml;
+
+  // Populate Accessories checkboxes
+  const accDiv = document.getElementById('imp-accessories-checkboxes');
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  if (accList.length === 0) {
+    accDiv.innerHTML = '<span style="color:var(--text-muted);">Žádné příslušenství na skladě.</span>';
+  } else {
+    let accHtml = '';
+    accList.forEach(a => {
+      const qty = parseInt(a.quantity) || 1;
+      accHtml += `
+        <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; cursor:pointer;">
+          <input type="checkbox" name="imp-acc-checkbox" value="${a.id}" data-name="${a.name} (${a.code})">
+          <span><strong>${a.name}</strong> (Kód: ${a.code}, Sklad: ${a.location}, ${qty} ks)</span>
+        </label>
+      `;
+    });
+    accDiv.innerHTML = accHtml;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeNewImplantationModal() {
+  const modal = document.getElementById('new-implantation-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function saveNewImplantation() {
+  const date = document.getElementById('imp-date').value;
+  const hospital = document.getElementById('imp-hospital').value;
+  const time_from = document.getElementById('imp-time-from').value;
+  const time_to = document.getElementById('imp-time-to').value;
+  const gender = document.getElementById('imp-gender').value;
+  const birth_date = document.getElementById('imp-birth-date').value;
+  const mitraclipId = document.getElementById('imp-mitraclip').value;
+  const triclipId = document.getElementById('imp-triclip').value;
+  const indication = document.getElementById('imp-indication').value.trim();
+  const location = document.getElementById('imp-location').value.trim();
+
+  if (!date || !hospital || !time_from || !time_to || !birth_date || !indication || !location) {
+    alert('Prosím vyplňte všechna povinná pole (Datum, Nemocnice, Časy, Narození, Indikace, Umístění).');
+    return;
+  }
+
+  const checkedBoxes = document.querySelectorAll('input[name="imp-acc-checkbox"]:checked');
+  const accIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+  const accNames = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-name'));
+
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+
+  let mitraclipName = '-';
+  if (mitraclipId) {
+    const item = clipList.find(c => c.id === parseInt(mitraclipId));
+    if (item) {
+      mitraclipName = `${item.name} (${item.code})`;
+      item.quantity = (parseInt(item.quantity) || 1) - 1;
+    }
+  }
+
+  let triclipName = '-';
+  if (triclipId) {
+    const item = clipList.find(c => c.id === parseInt(triclipId));
+    if (item) {
+      triclipName = `${item.name} (${item.code})`;
+      item.quantity = (parseInt(item.quantity) || 1) - 1;
+    }
+  }
+
+  accIds.forEach(accId => {
+    const item = accList.find(a => a.id === accId);
+    if (item) {
+      item.quantity = (parseInt(item.quantity) || 1) - 1;
+    }
+  });
+
+  if (vlastaData.codebooks) {
+    if (vlastaData.codebooks.clip) {
+      vlastaData.codebooks.clip = vlastaData.codebooks.clip.filter(c => (parseInt(c.quantity) || 0) > 0);
+    }
+    if (vlastaData.codebooks.accessories) {
+      vlastaData.codebooks.accessories = vlastaData.codebooks.accessories.filter(a => (parseInt(a.quantity) || 0) > 0);
+    }
+  }
+
+  if (!vlastaData.implantations) vlastaData.implantations = [];
+  const newIdNum = vlastaData.implantations.length + 1;
+  const newImp = {
+    id: `IMP-2026-${String(newIdNum).padStart(3, '0')}`,
+    date,
+    hospital,
+    time_from,
+    time_to,
+    gender,
+    birth_date,
+    mitraclip_name: mitraclipName,
+    triclip_name: triclipName,
+    accessories: accNames,
+    indication,
+    location
+  };
+
+  vlastaData.implantations.unshift(newImp);
+
+  fetch('/api/vlasta/implantations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ implantation: newImp, codebooks: vlastaData.codebooks })
+  })
+  .then(r => r.json())
+  .then(res => {
+    closeNewImplantationModal();
+    renderImplantationsTable();
+    renderItemsTable();
+    renderClipTable(vlastaData.codebooks.clip || []);
+    renderAccessoriesTable(vlastaData.codebooks.accessories || []);
+    renderDashboardStats();
+    alert(`Implantace ${newImp.id} byla úspěšně uložena a použité položky byly odepsány ze skladu!`);
+  })
+  .catch(err => {
+    console.error('Chyba při ukládání implantace:', err);
+    closeNewImplantationModal();
+    renderImplantationsTable();
+    renderItemsTable();
+    if (vlastaData.codebooks) {
+      renderClipTable(vlastaData.codebooks.clip || []);
+      renderAccessoriesTable(vlastaData.codebooks.accessories || []);
+    }
+    renderDashboardStats();
+  });
+}
+
+function deleteImplantation(impId) {
+  if (!confirm(`Opravdu si přejete smazat záznam implantace ${impId}?`)) return;
+  vlastaData.implantations = (vlastaData.implantations || []).filter(i => i.id !== impId);
+  fetch('/api/vlasta/implantations', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: impId })
+  })
+  .then(() => {
+    renderImplantationsTable();
+  })
+  .catch(err => {
+    console.error(err);
+    renderImplantationsTable();
+  });
+}
 
