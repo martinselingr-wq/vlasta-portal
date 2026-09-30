@@ -788,16 +788,16 @@ def load_db():
                     { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" }
                 ],
                 "clip": [
-                    { "id": 1, "code": "TSGC0802", "name": "TriClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050892", "lot": "60504R1045", "ref": "TSGC0802", "expiry": "2028-12-31" },
-                    { "id": 2, "code": "CDS0802-XTW", "name": "MitraClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050755", "lot": "60402A1107", "ref": "CDS0802-XTW", "expiry": "2028-09-30" },
-                    { "id": 3, "code": "CDS0802-XT", "name": "MitraClip™ G5 Delivery System XT", "udi_di": "(01) 05415067050861", "lot": "60401A1072", "ref": "CDS0802-XT", "expiry": "2028-10-31" },
-                    { "id": 4, "code": "TCDS0802-XTW", "name": "TriClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050786", "lot": "60319R1082", "ref": "TCDS0802-XTW", "expiry": "2028-06-30" },
-                    { "id": 5, "code": "SGC0802", "name": "MitraClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050823", "lot": "60317A2021", "ref": "SGC0802", "expiry": "2028-11-30" }
+                    { "id": 1, "code": "CDS0802-XTW", "name": "MitraClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050755", "lot": "60402A1107", "ref": "CDS0802-XTW", "expiry": "2028-09-30" },
+                    { "id": 2, "code": "CDS0802-XT", "name": "MitraClip™ G5 Delivery System XT", "udi_di": "(01) 05415067050861", "lot": "60401A1072", "ref": "CDS0802-XT", "expiry": "2028-10-31" },
+                    { "id": 3, "code": "TCDS0802-XTW", "name": "TriClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050786", "lot": "60319R1082", "ref": "TCDS0802-XTW", "expiry": "2028-06-30" }
                 ],
                 "accessories": [
-                    { "id": 1, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "udi_di": "(01) 05415067011224", "lot": "70123R2001", "ref": "1458Q-86", "expiry": "2029-01-31" },
-                    { "id": 2, "code": "405120", "name": "Peel-Away Introducer 405120", "udi_di": "(01) 05415067022335", "lot": "70211A3012", "ref": "PAI-405120", "expiry": "2028-08-31" },
-                    { "id": 3, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "udi_di": "(01) 05415067033446", "lot": "70315C1045", "ref": "DS2C019-U", "expiry": "2029-03-31" }
+                    { "id": 1, "code": "TSGC0802", "name": "TriClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050892", "lot": "60504R1045", "ref": "TSGC0802", "expiry": "2028-12-31" },
+                    { "id": 2, "code": "SGC0802", "name": "MitraClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050823", "lot": "60317A2021", "ref": "SGC0802", "expiry": "2028-11-30" },
+                    { "id": 3, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "udi_di": "(01) 05415067011224", "lot": "70123R2001", "ref": "1458Q-86", "expiry": "2029-01-31" },
+                    { "id": 4, "code": "405120", "name": "Peel-Away Introducer 405120", "udi_di": "(01) 05415067022335", "lot": "70211A3012", "ref": "PAI-405120", "expiry": "2028-08-31" },
+                    { "id": 5, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "udi_di": "(01) 05415067033446", "lot": "70315C1045", "ref": "DS2C019-U", "expiry": "2029-03-31" }
                 ]
             },
             "logs": []
