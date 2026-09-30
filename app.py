@@ -1308,6 +1308,13 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None, item_id=None):
 
 app = Flask(__name__)
 
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 @app.route('/')
 def index():
     idx_path = os.path.join(WEB_DIR, 'index.html')
