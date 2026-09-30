@@ -231,8 +231,10 @@
                       <th>Název Nemocnice</th>
                       <th>Město</th>
                       <th>Adresa</th>
-                      <th>Preferovaná Značka</th>
-                      <th>Stav Tendru</th>
+                      <th>Začátek Tendru</th>
+                      <th>Délka (v letech)</th>
+                      <th>Konec Tendru (Automatický)</th>
+                      <th style="text-align: right;">Akce</th>
                     </tr>
                   </thead>
                   <tbody id="cb-table-hospitals"></tbody>
@@ -385,6 +387,53 @@
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeTechnicianModal()">Zrušit</button>
         <button class="btn-primary" onclick="saveTechnicianModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  <!-- Modal for Hospital Add / Edit -->
+  <div id="hospital-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="hosp-modal-title"><i class="fa-solid fa-hospital"></i> Úprava Nemocnice</h3>
+        <button class="modal-close" onclick="closeHospitalModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="hosp-id">
+        <div class="form-group margin-bottom-sm">
+          <label for="hosp-name">Název Nemocnice / Kardiocentra</label>
+          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Brno Bohunice">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="hosp-city">Město</label>
+          <input type="text" id="hosp-city" class="modal-input" placeholder="např. Brno">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="hosp-address">Adresa</label>
+          <input type="text" id="hosp-address" class="modal-input" placeholder="např. Jihlavská 20, Brno">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group margin-bottom-sm">
+            <label for="hosp-tender-start">Začátek Tendru</label>
+            <input type="date" id="hosp-tender-start" class="modal-input" onchange="calculateTenderEnd()">
+          </div>
+          <div class="form-group margin-bottom-sm">
+            <label for="hosp-tender-duration">Délka Tendru (v letech)</label>
+            <select id="hosp-tender-duration" class="modal-input" onchange="calculateTenderEnd()">
+              <option value="1">1 rok</option>
+              <option value="2">2 roky</option>
+              <option value="3" selected>3 roky</option>
+              <option value="4">4 roky</option>
+              <option value="5">5 let</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="hosp-tender-end">Konec Tendru (Vypočteno automaticky)</label>
+          <input type="date" id="hosp-tender-end" class="modal-input" readonly style="opacity: 0.85; background: #070a11; cursor: not-allowed; color: var(--accent-cyan); font-weight: 600;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeHospitalModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveHospitalModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
       </div>
     </div>
   </div>
