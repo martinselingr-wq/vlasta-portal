@@ -1,28 +1,5 @@
 {
-  "items": [
-    {
-      "id": 1,
-      "code": "VLS-1001",
-      "name": "Vlasta Modul Alpha",
-      "category": "Clip",
-      "status": "Aktivní",
-      "location": "Hlavní sklad",
-      "quantity": 25,
-      "expiry": "2027-06-30",
-      "created_at": "2026-09-30T14:00:00"
-    },
-    {
-      "id": 2,
-      "code": "VLS-1002",
-      "name": "Vlasta Modul Beta",
-      "category": "Příslušenství",
-      "status": "Aktivní",
-      "location": "Středisko 1",
-      "quantity": 14,
-      "expiry": "2026-11-15",
-      "created_at": "2026-09-30T14:15:00"
-    }
-  ],
+  "items": [],
   "codebooks": {
     "technicians": [
       {
@@ -119,7 +96,7 @@
         "udi_di": "(01) 05415067050861",
         "lot": "60401A1072",
         "ref": "CDS0802-XT",
-        "expiry": "2026-11-15",
+        "expiry": "2026-10-15",
         "location": "FN Brno Bohunice",
         "quantity": 2
       },
@@ -143,6 +120,17 @@
         "ref": "CDS0802-XTW",
         "expiry": "2028-09-30",
         "location": "IKEM Praha",
+        "quantity": 1
+      },
+      {
+        "id": 5,
+        "code": "CDS0802-NTW",
+        "name": "MitraClip™ G5 Delivery System NTW",
+        "udi_di": "(01) 05415067050779",
+        "lot": "60405B2011",
+        "ref": "CDS0802-NTW",
+        "expiry": "2026-11-20",
+        "location": "Henio (Henryk Szymeczek)",
         "quantity": 1
       }
     ],
@@ -210,6 +198,17 @@
         "lot": "70315C1045",
         "ref": "DS2C019-U",
         "expiry": "2029-03-31",
+        "location": "IKEM Praha",
+        "quantity": 2
+      },
+      {
+        "id": 7,
+        "code": "SGC0802",
+        "name": "MitraClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050823",
+        "lot": "60317A2025",
+        "ref": "SGC0802",
+        "expiry": "2026-12-05",
         "location": "IKEM Praha",
         "quantity": 2
       }
