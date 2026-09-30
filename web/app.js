@@ -1091,6 +1091,7 @@ function renderImplantationsTable() {
         <td><span style="color:#10b981; font-weight:600;">${tri}</span></td>
         <td style="text-align: right;">
           <button class="btn-sm btn-secondary" onclick="openImplantationDetailModal('${imp.id}')"><i class="fa-solid fa-eye"></i> Detail</button>
+          <button class="btn-sm btn-secondary" style="color:#06b6d4;" onclick="openEditImplantationModal('${imp.id}')"><i class="fa-solid fa-pen-to-square"></i> Upravit</button>
           <button class="btn-sm btn-secondary" style="color:#ef4444;" onclick="deleteImplantation('${imp.id}')"><i class="fa-solid fa-trash"></i></button>
         </td>
       </tr>
@@ -1100,7 +1101,10 @@ function renderImplantationsTable() {
   tbody.innerHTML = html;
 }
 
+let currentDetailImpId = null;
+
 function openImplantationDetailModal(impId) {
+  currentDetailImpId = impId;
   const list = vlastaData.implantations || [];
   const imp = list.find(i => i.id === impId);
   if (!imp) return;
@@ -1168,9 +1172,53 @@ function closeImplantationDetailModal() {
   if (modal) modal.style.display = 'none';
 }
 
+function editImplantationFromDetail() {
+  if (!currentDetailImpId) return;
+  const impId = currentDetailImpId;
+  closeImplantationDetailModal();
+  openEditImplantationModal(impId);
+}
+
+function openEditImplantationModal(impId) {
+  const imp = (vlastaData.implantations || []).find(i => i.id === impId);
+  if (!imp) return;
+
+  openNewImplantationModal();
+
+  const titleEl = document.getElementById('new-imp-modal-title');
+  if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color:#06b6d4;"></i> Úprava Implantace ${impId}`;
+  
+  const editIdEl = document.getElementById('imp-edit-id');
+  if (editIdEl) editIdEl.value = impId;
+
+  document.getElementById('imp-date').value = imp.date || '';
+  document.getElementById('imp-hospital').value = imp.hospital || '';
+  document.getElementById('imp-time-from').value = imp.time_from || '09:00';
+  document.getElementById('imp-time-to').value = imp.time_to || '11:30';
+  document.getElementById('imp-gender').value = imp.gender || 'Muž';
+  document.getElementById('imp-birth-date').value = imp.birth_date || '1960-01-01';
+  document.getElementById('imp-indication').value = imp.indication || '';
+  document.getElementById('imp-location').value = imp.location || '';
+
+  // Select matching accessories checkboxes
+  if (imp.accessories && Array.isArray(imp.accessories)) {
+    const checkboxes = document.querySelectorAll('input[name="imp-acc-checkbox"]');
+    checkboxes.forEach(cb => {
+      const name = cb.getAttribute('data-name') || '';
+      cb.checked = imp.accessories.some(acc => name.toLowerCase().includes(acc.toLowerCase()) || acc.toLowerCase().includes(name.toLowerCase()));
+    });
+  }
+}
+
 function openNewImplantationModal() {
   const modal = document.getElementById('new-implantation-modal');
   if (!modal) return;
+
+  const titleEl = document.getElementById('new-imp-modal-title');
+  if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-heart-pulse"></i> Zadání Nové Implantace`;
+
+  const editIdEl = document.getElementById('imp-edit-id');
+  if (editIdEl) editIdEl.value = '';
 
   const todayStr = new Date().toISOString().split('T')[0];
   document.getElementById('imp-date').value = todayStr;
@@ -1253,6 +1301,8 @@ function saveNewImplantation() {
     return;
   }
 
+  const editId = document.getElementById('imp-edit-id') ? document.getElementById('imp-edit-id').value : '';
+
   const checkedBoxes = document.querySelectorAll('input[name="imp-acc-checkbox"]:checked');
   const accIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
   const accNames = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-name'));
@@ -1265,7 +1315,6 @@ function saveNewImplantation() {
     const item = clipList.find(c => c.id === parseInt(mitraclipId));
     if (item) {
       mitraclipName = `${item.name} (${item.code})`;
-      item.quantity = (parseInt(item.quantity) || 1) - 1;
     }
   }
 
@@ -1274,23 +1323,66 @@ function saveNewImplantation() {
     const item = clipList.find(c => c.id === parseInt(triclipId));
     if (item) {
       triclipName = `${item.name} (${item.code})`;
-      item.quantity = (parseInt(item.quantity) || 1) - 1;
     }
   }
 
-  accIds.forEach(accId => {
-    const item = accList.find(a => a.id === accId);
-    if (item) {
-      item.quantity = (parseInt(item.quantity) || 1) - 1;
-    }
-  });
+  if (editId) {
+    const existingImp = (vlastaData.implantations || []).find(i => i.id === editId);
+    if (existingImp) {
+      existingImp.date = date;
+      existingImp.hospital = hospital;
+      existingImp.time_from = time_from;
+      existingImp.time_to = time_to;
+      existingImp.gender = gender;
+      existingImp.birth_date = birth_date;
+      existingImp.indication = indication;
+      existingImp.location = location;
+      if (mitraclipName !== '-') existingImp.mitraclip_name = mitraclipName;
+      if (triclipName !== '-') existingImp.triclip_name = triclipName;
+      if (accNames.length > 0) existingImp.accessories = accNames;
 
-  if (vlastaData.codebooks) {
-    if (vlastaData.codebooks.clip) {
-      vlastaData.codebooks.clip = vlastaData.codebooks.clip.filter(c => (parseInt(c.quantity) || 0) > 0);
+      fetch('/api/vlasta/implantations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ implantation: existingImp, codebooks: vlastaData.codebooks })
+      })
+      .then(r => r.json())
+      .then(res => {
+        closeNewImplantationModal();
+        renderImplantationsTable();
+        renderDashboardStats();
+        alert(`Záznam implantace ${editId} byl úspěšně upraven!`);
+      })
+      .catch(err => {
+        console.error('Chyba při úpravě implantace:', err);
+        closeNewImplantationModal();
+        renderImplantationsTable();
+      });
+      return;
     }
-    if (vlastaData.codebooks.accessories) {
-      vlastaData.codebooks.accessories = vlastaData.codebooks.accessories.filter(a => (parseInt(a.quantity) || 0) > 0);
+  }
+
+  if (!editId) {
+    if (mitraclipId) {
+      const item = clipList.find(c => c.id === parseInt(mitraclipId));
+      if (item) item.quantity = (parseInt(item.quantity) || 1) - 1;
+    }
+    if (triclipId) {
+      const item = clipList.find(c => c.id === parseInt(triclipId));
+      if (item) item.quantity = (parseInt(item.quantity) || 1) - 1;
+    }
+    accIds.forEach(accId => {
+      const item = accList.find(a => a.id === accId);
+      if (item) item.quantity = (parseInt(item.quantity) || 1) - 1;
+    });
+
+    if (vlastaData.codebooks) {
+      if (vlastaData.codebooks.clip) {
+        vlastaData.codebooks.clip = vlastaData.codebooks.clip.filter(c => (parseInt(c.quantity) || 0) > 0);
+      }
+      if (vlastaData.codebooks.accessories) {
+        vlastaData.codebooks.accessories = vlastaData.codebooks.accessories.filter(a => (parseInt(a.quantity) || 0) > 0);
+      }
     }
   }
 
@@ -1326,17 +1418,13 @@ function saveNewImplantation() {
     renderClipTable(vlastaData.codebooks.clip || []);
     renderAccessoriesTable(vlastaData.codebooks.accessories || []);
     renderDashboardStats();
-    alert(`Implantace ${newImp.id} byla úspěšně uložena a použité položky byly odepsány ze skladu!`);
+    alert(`Implantace ${newImp.id} byla úspěšně uložena!`);
   })
   .catch(err => {
     console.error('Chyba při ukládání implantace:', err);
     closeNewImplantationModal();
     renderImplantationsTable();
     renderItemsTable();
-    if (vlastaData.codebooks) {
-      renderClipTable(vlastaData.codebooks.clip || []);
-      renderAccessoriesTable(vlastaData.codebooks.accessories || []);
-    }
     renderDashboardStats();
   });
 }
