@@ -169,14 +169,14 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
 
         <div class="cb-pane" id="cb-pane-clip">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><div style="display: flex; gap: 10px; align-items: center;"><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-clip-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterClipTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px;"></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div></div>
+            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><div style="display: flex; gap: 8px; align-items: center;"><select id="filter-clip-field" onchange="updateClipFilterOptions()" class="modal-input" style="padding: 7px 10px; width: 145px; font-size: 13px; margin:0;"><option value="all">Filtruj vše</option><option value="lot">LOT / Sériové č.</option><option value="code">Kód materiálu</option><option value="location">Sklad / Pracoviště</option><option value="name">Název materiálu</option></select><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-clip-input" list="filter-clip-datalist" placeholder="Vyberte ze seznamu / zadejte..." oninput="filterClipTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 220px;"><datalist id="filter-clip-datalist"></datalist></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div></div>
             <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-clip"></tbody></table></div></div>
           </div>
         </div>
 
         <div class="cb-pane" id="cb-pane-accessories">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><div style="display: flex; gap: 10px; align-items: center;"><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-acc-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterAccessoriesTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px;"></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div></div>
+            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><div style="display: flex; gap: 8px; align-items: center;"><select id="filter-acc-field" onchange="updateAccFilterOptions()" class="modal-input" style="padding: 7px 10px; width: 145px; font-size: 13px; margin:0;"><option value="all">Filtruj vše</option><option value="lot">LOT / Sériové č.</option><option value="code">Kód materiálu</option><option value="location">Sklad / Pracoviště</option><option value="name">Název materiálu</option></select><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-acc-input" list="filter-acc-datalist" placeholder="Vyberte ze seznamu / zadejte..." oninput="filterAccessoriesTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 220px;"><datalist id="filter-acc-datalist"></datalist></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div></div>
             <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
           </div>
         </div>
@@ -483,6 +483,8 @@ function loadVlastaCodebooks() {
     renderHospitalsTable(data.hospitals || []);
     renderClipTable(data.clip || data.material || []);
     renderAccessoriesTable(data.accessories || []);
+    updateClipFilterOptions();
+    updateAccFilterOptions();
     renderItemsTable();
     renderDashboardStats();
   }).catch(err => console.error(err));
@@ -676,11 +678,36 @@ function renderClipTable(items) {
   tbody.innerHTML = html;
 }
 
+function updateClipFilterOptions() {
+  const field = document.getElementById('filter-clip-field')?.value || 'all';
+  const datalist = document.getElementById('filter-clip-datalist');
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  if (!datalist) return;
+  const optionsSet = new Set();
+  clipList.forEach(c => {
+    if (field === 'lot' && c.lot) optionsSet.add(c.lot);
+    else if (field === 'code' && c.code) optionsSet.add(c.code);
+    else if (field === 'location' && c.location) optionsSet.add(c.location);
+    else if (field === 'name' && c.name) optionsSet.add(c.name);
+    else if (field === 'all') { if (c.lot) optionsSet.add(c.lot); if (c.code) optionsSet.add(c.code); if (c.location) optionsSet.add(c.location); }
+  });
+  let optionsHtml = ''; optionsSet.forEach(opt => { optionsHtml += `<option value="${opt}"></option>`; });
+  datalist.innerHTML = optionsHtml;
+  filterClipTable();
+}
+
 function filterClipTable() {
+  const field = document.getElementById('filter-clip-field')?.value || 'all';
   const q = (document.getElementById('filter-clip-input')?.value || '').toLowerCase().trim();
   const rawList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
   if (!q) { renderClipTable(rawList); return; }
-  const filtered = rawList.filter(c => (c.code && c.code.toLowerCase().includes(q)) || (c.name && c.name.toLowerCase().includes(q)) || (c.udi_di && c.udi_di.toLowerCase().includes(q)) || (c.lot && c.lot.toLowerCase().includes(q)) || (c.ref && c.ref.toLowerCase().includes(q)) || (c.location && c.location.toLowerCase().includes(q)) || (c.id && String(c.id).includes(q)));
+  const filtered = rawList.filter(c => {
+    if (field === 'lot') return c.lot && c.lot.toLowerCase().includes(q);
+    if (field === 'code') return c.code && c.code.toLowerCase().includes(q);
+    if (field === 'location') return c.location && c.location.toLowerCase().includes(q);
+    if (field === 'name') return c.name && c.name.toLowerCase().includes(q);
+    return (c.code && c.code.toLowerCase().includes(q)) || (c.name && c.name.toLowerCase().includes(q)) || (c.udi_di && c.udi_di.toLowerCase().includes(q)) || (c.lot && c.lot.toLowerCase().includes(q)) || (c.ref && c.ref.toLowerCase().includes(q)) || (c.location && c.location.toLowerCase().includes(q)) || (c.id && String(c.id).includes(q));
+  });
   renderClipTable(filtered);
 }
 
@@ -756,11 +783,36 @@ function renderAccessoriesTable(items) {
   tbody.innerHTML = html;
 }
 
+function updateAccFilterOptions() {
+  const field = document.getElementById('filter-acc-field')?.value || 'all';
+  const datalist = document.getElementById('filter-acc-datalist');
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  if (!datalist) return;
+  const optionsSet = new Set();
+  accList.forEach(a => {
+    if (field === 'lot' && a.lot) optionsSet.add(a.lot);
+    else if (field === 'code' && a.code) optionsSet.add(a.code);
+    else if (field === 'location' && a.location) optionsSet.add(a.location);
+    else if (field === 'name' && a.name) optionsSet.add(a.name);
+    else if (field === 'all') { if (a.lot) optionsSet.add(a.lot); if (a.code) optionsSet.add(a.code); if (a.location) optionsSet.add(a.location); }
+  });
+  let optionsHtml = ''; optionsSet.forEach(opt => { optionsHtml += `<option value="${opt}"></option>`; });
+  datalist.innerHTML = optionsHtml;
+  filterAccessoriesTable();
+}
+
 function filterAccessoriesTable() {
+  const field = document.getElementById('filter-acc-field')?.value || 'all';
   const q = (document.getElementById('filter-acc-input')?.value || '').toLowerCase().trim();
   const rawList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
   if (!q) { renderAccessoriesTable(rawList); return; }
-  const filtered = rawList.filter(a => (a.code && a.code.toLowerCase().includes(q)) || (a.name && a.name.toLowerCase().includes(q)) || (a.udi_di && a.udi_di.toLowerCase().includes(q)) || (a.lot && a.lot.toLowerCase().includes(q)) || (a.ref && a.ref.toLowerCase().includes(q)) || (a.location && a.location.toLowerCase().includes(q)) || (a.id && String(a.id).includes(q)));
+  const filtered = rawList.filter(a => {
+    if (field === 'lot') return a.lot && a.lot.toLowerCase().includes(q);
+    if (field === 'code') return a.code && a.code.toLowerCase().includes(q);
+    if (field === 'location') return a.location && a.location.toLowerCase().includes(q);
+    if (field === 'name') return a.name && a.name.toLowerCase().includes(q);
+    return (a.code && a.code.toLowerCase().includes(q)) || (a.name && a.name.toLowerCase().includes(q)) || (a.udi_di && a.udi_di.toLowerCase().includes(q)) || (a.lot && a.lot.toLowerCase().includes(q)) || (a.ref && a.ref.toLowerCase().includes(q)) || (a.location && a.location.toLowerCase().includes(q)) || (a.id && String(a.id).includes(q));
+  });
   renderAccessoriesTable(filtered);
 }
 
