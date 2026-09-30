@@ -214,6 +214,36 @@
       }
     ]
   },
+  "implantations": [
+    {
+      "id": "IMP-2026-001",
+      "date": "2026-09-28",
+      "hospital": "FNsP Ostrava Poruba",
+      "time_from": "09:30",
+      "time_to": "11:45",
+      "gender": "Muž",
+      "birth_date": "1958-04-12",
+      "mitraclip_name": "MitraClip™ G5 Delivery System XTW (CDS0802-XTW)",
+      "triclip_name": "-",
+      "accessories": ["MitraClip™ G5 Steerable Guide Catheter (SGC0802)"],
+      "indication": "Těžká sekundární mitrální regurgitace st. IV",
+      "location": "Segment A2/P2"
+    },
+    {
+      "id": "IMP-2026-002",
+      "date": "2026-09-29",
+      "hospital": "IKEM Praha",
+      "time_from": "13:00",
+      "time_to": "15:15",
+      "gender": "Žena",
+      "birth_date": "1964-11-03",
+      "mitraclip_name": "-",
+      "triclip_name": "TriClip™ G5 Delivery System XTW (TCDS0802-XTW)",
+      "accessories": ["TriClip™ G5 Steerable Guide Catheter (TSGC0802)", "Peel-Away Introducer 405120"],
+      "indication": "Těžká trikuspidální regurgitace",
+      "location": "Anteroseptální komisura"
+    }
+  ],
   "logs": [
     {
       "ts": "2026-09-30T15:06:00",
