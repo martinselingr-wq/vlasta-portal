@@ -108,7 +108,8 @@
         "udi_di": "(01) 05415067050755",
         "lot": "60402A1107",
         "ref": "CDS0802-XTW",
-        "expiry": "2028-09-30"
+        "expiry": "2028-09-30",
+        "location": "FNsP Ostrava Poruba"
       },
       {
         "id": 2,
@@ -117,7 +118,8 @@
         "udi_di": "(01) 05415067050861",
         "lot": "60401A1072",
         "ref": "CDS0802-XT",
-        "expiry": "2028-10-31"
+        "expiry": "2028-10-31",
+        "location": "FN Brno Bohunice"
       },
       {
         "id": 3,
@@ -126,7 +128,8 @@
         "udi_di": "(01) 05415067050786",
         "lot": "60319R1082",
         "ref": "TCDS0802-XTW",
-        "expiry": "2028-06-30"
+        "expiry": "2028-06-30",
+        "location": "Martin Selingr"
       }
     ],
     "accessories": [
@@ -137,7 +140,8 @@
         "udi_di": "(01) 05415067050892",
         "lot": "60504R1045",
         "ref": "TSGC0802",
-        "expiry": "2028-12-31"
+        "expiry": "2028-12-31",
+        "location": "FNsP Ostrava Poruba"
       },
       {
         "id": 2,
@@ -146,7 +150,8 @@
         "udi_di": "(01) 05415067050823",
         "lot": "60317A2021",
         "ref": "SGC0802",
-        "expiry": "2028-11-30"
+        "expiry": "2028-11-30",
+        "location": "FNsP Ostrava Poruba"
       },
       {
         "id": 3,
@@ -155,7 +160,8 @@
         "udi_di": "(01) 05415067011224",
         "lot": "70123R2001",
         "ref": "1458Q-86",
-        "expiry": "2029-01-31"
+        "expiry": "2029-01-31",
+        "location": "Jaroslav Černý"
       },
       {
         "id": 4,
@@ -164,7 +170,8 @@
         "udi_di": "(01) 05415067022335",
         "lot": "70211A3012",
         "ref": "PAI-405120",
-        "expiry": "2028-08-31"
+        "expiry": "2028-08-31",
+        "location": "Hlavní sklad CARDION"
       },
       {
         "id": 5,
@@ -173,14 +180,15 @@
         "udi_di": "(01) 05415067033446",
         "lot": "70315C1045",
         "ref": "DS2C019-U",
-        "expiry": "2029-03-31"
+        "expiry": "2029-03-31",
+        "location": "IKEM Praha"
       }
     ]
   },
   "logs": [
     {
       "ts": "2026-09-30T15:06:00",
-      "event": "Rozdělení položek: Delivery System -> Clip, ostatní -> Příslušenství",
+      "event": "Přidána položka Sklad s dynamickým výběrem Nemocnic a Techníků",
       "user": "AGY"
     }
   ]
