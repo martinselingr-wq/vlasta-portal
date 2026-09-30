@@ -385,9 +385,10 @@ body { font-family: var(--font-sans); background-color: var(--bg-dark); color: v
 .modal-close:hover { color: #ef4444; }
 .modal-body label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
 .modal-input { width: 100%; padding: 10px 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 14px; margin-bottom: 12px; box-sizing: border-box; }
-.modal-input:focus { outline: none; border-color: var(--accent-cyan); }
-.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px; }
 .margin-bottom-sm { margin-bottom: 12px; }
+input[type="date"] { position: relative; color-scheme: dark; }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; border-radius: 6px; background-color: rgba(6, 182, 212, 0.2); padding: 4px 6px; margin-left: 6px; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(145deg); border: 1px solid rgba(6, 182, 212, 0.5); transition: all 0.2s ease; }
+input[type="date"]::-webkit-calendar-picker-indicator:hover { background-color: rgba(6, 182, 212, 0.45); border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.6); transform: scale(1.08); }
 """
 
 EMBEDDED_APP_JS = """
