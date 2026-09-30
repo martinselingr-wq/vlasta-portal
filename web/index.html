@@ -285,7 +285,13 @@
           <div class="grid-card">
             <div class="card-header">
               <h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3>
-              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="position: relative; display: flex; align-items: center;">
+                  <i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i>
+                  <input type="text" id="filter-clip-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterClipTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px; transition: all 0.2s;">
+                </div>
+                <button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button>
+              </div>
             </div>
             <div class="card-body">
               <div class="table-container">
@@ -315,7 +321,13 @@
           <div class="grid-card">
             <div class="card-header">
               <h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3>
-              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="position: relative; display: flex; align-items: center;">
+                  <i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i>
+                  <input type="text" id="filter-acc-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterAccessoriesTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px; transition: all 0.2s;">
+                </div>
+                <button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button>
+              </div>
             </div>
             <div class="card-body">
               <div class="table-container">
