@@ -160,7 +160,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <div class="cb-pane" id="cb-pane-hospitals">
           <div class="grid-card">
             <div class="card-header"><h3><i class="fa-solid fa-hospital"></i> Číselník Nemocnic a Kardiocenter</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('hospitals')"><i class="fa-solid fa-plus"></i> Přidat Nemocnici</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Název Nemocnice</th><th>Město</th><th>Adresa</th><th>Preferovaná Značka</th><th>Stav Tendru</th></tr></thead><tbody id="cb-table-hospitals"></tbody></table></div></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Název Nemocnice</th><th>Město</th><th>Adresa</th><th>Začátek Tendru</th><th>Délka (v letech)</th><th>Konec Tendru (Automatický)</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-hospitals"></tbody></table></div></div>
           </div>
         </div>
 
@@ -249,6 +249,54 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeTechnicianModal()">Zrušit</button>
         <button class="btn-primary" onclick="saveTechnicianModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="hospital-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="hosp-modal-title"><i class="fa-solid fa-hospital"></i> Úprava Nemocnice</h3>
+        <button class="modal-close" onclick="closeHospitalModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="hosp-id">
+        <div class="form-group margin-bottom-sm">
+          <label>Název Nemocnice / Kardiocentra</label>
+          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Brno Bohunice">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>Město</label>
+          <input type="text" id="hosp-city" class="modal-input" placeholder="např. Brno">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>Adresa</label>
+          <input type="text" id="hosp-address" class="modal-input" placeholder="např. Jihlavská 20, Brno">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group margin-bottom-sm">
+            <label>Začátek Tendru</label>
+            <input type="date" id="hosp-tender-start" class="modal-input" onchange="calculateTenderEnd()">
+          </div>
+          <div class="form-group margin-bottom-sm">
+            <label>Délka Tendru (v letech)</label>
+            <select id="hosp-tender-duration" class="modal-input" onchange="calculateTenderEnd()">
+              <option value="1">1 rok</option>
+              <option value="2">2 roky</option>
+              <option value="3" selected>3 roky</option>
+              <option value="4">4 roky</option>
+              <option value="5">5 let</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>Konec Tendru (Vypočteno automaticky)</label>
+          <input type="date" id="hosp-tender-end" class="modal-input" readonly style="opacity: 0.85; background: #070a11; cursor: not-allowed; color: var(--accent-cyan); font-weight: 600;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeHospitalModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveHospitalModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
       </div>
     </div>
   </div>
@@ -462,12 +510,82 @@ function deleteTechnician(techId) {
 }
 
 function renderHospitalsTable(items) {
-  const tbody = document.getElementById('cb-table-hospitals');
   if (!tbody) return;
-  if (!items.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádné nemocnice.</td></tr>'; return; }
+  if (!items || !items.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné nemocnice.</td></tr>'; return; }
   let html = '';
-  items.forEach(h => { html += `<tr><td>#${h.id}</td><td><strong>${h.name}</strong></td><td>${h.city}</td><td>${h.address}</td><td><span class="badge-vlasta">${h.preferred_brand}</span></td><td><span style="color:#10b981;">● ${h.tender_status}</span></td></tr>`; });
+  items.forEach(h => {
+    const durationText = `${h.tender_duration_years || 1} ${h.tender_duration_years == 1 ? 'rok' : (h.tender_duration_years < 5 ? 'roky' : 'let')}`;
+    const tenderEndBadge = h.tender_end ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-regular fa-calendar-check"></i> ${h.tender_end}</span>` : '-';
+    html += `<tr><td>#${h.id}</td><td><strong>${h.name}</strong></td><td>${h.city}</td><td>${h.address}</td><td>${h.tender_start || '-'}</td><td><span class="badge-vlasta">${durationText}</span></td><td>${tenderEndBadge}</td><td style="text-align: right;"><button class="btn-secondary btn-sm" onclick="showEditHospitalModal(${h.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button> <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteHospital(${h.id})"><i class="fa-solid fa-trash"></i> Smazat</button></td></tr>`;
+  });
   tbody.innerHTML = html;
+}
+
+function openHospitalModal(hospId = null) {
+  const modal = document.getElementById('hospital-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('hosp-modal-title');
+  document.getElementById('hosp-id').value = hospId || '';
+  if (hospId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-hospital-user"></i> Úprava Nemocnice / Kardiocentra';
+    const hosp = ((vlastaData.codebooks && vlastaData.codebooks.hospitals) || []).find(h => h.id === hospId);
+    if (hosp) {
+      document.getElementById('hosp-name').value = hosp.name || '';
+      document.getElementById('hosp-city').value = hosp.city || '';
+      document.getElementById('hosp-address').value = hosp.address || '';
+      document.getElementById('hosp-tender-start').value = hosp.tender_start || '';
+      document.getElementById('hosp-tender-duration').value = hosp.tender_duration_years || 3;
+      document.getElementById('hosp-tender-end').value = hosp.tender_end || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-hospital-square"></i> Přidat Nemocnici / Kardiocentrum';
+    document.getElementById('hosp-name').value = '';
+    document.getElementById('hosp-city').value = '';
+    document.getElementById('hosp-address').value = '';
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('hosp-tender-start').value = todayStr;
+    document.getElementById('hosp-tender-duration').value = 3;
+  }
+  calculateTenderEnd();
+  modal.style.display = 'flex';
+}
+
+function showEditHospitalModal(hospId) { openHospitalModal(hospId); }
+function closeHospitalModal() { const modal = document.getElementById('hospital-modal'); if (modal) modal.style.display = 'none'; }
+
+function calculateTenderEnd() {
+  const startVal = document.getElementById('hosp-tender-start').value;
+  const durationYears = parseInt(document.getElementById('hosp-tender-duration').value) || 1;
+  const endInput = document.getElementById('hosp-tender-end');
+  if (!startVal) { endInput.value = ''; return; }
+  const parts = startVal.split('-');
+  if (parts.length === 3) {
+    const endYear = parseInt(parts[0]) + durationYears;
+    endInput.value = `${endYear}-${parts[1]}-${parts[2]}`;
+  }
+}
+
+function saveHospitalModal() {
+  const hospId = document.getElementById('hosp-id').value;
+  const name = document.getElementById('hosp-name').value.trim();
+  const city = document.getElementById('hosp-city').value.trim();
+  const address = document.getElementById('hosp-address').value.trim();
+  const tender_start = document.getElementById('hosp-tender-start').value;
+  const tender_duration_years = parseInt(document.getElementById('hosp-tender-duration').value) || 1;
+  const tender_end = document.getElementById('hosp-tender-end').value;
+  if (!name) { alert('Zadejte prosím název nemocnice.'); return; }
+  const itemData = { name, city: city || 'Brno', address: address || 'Hlavní 1', tender_start: tender_start || '2026-01-01', tender_duration_years, tender_end: tender_end || '2029-01-01' };
+  const action = hospId ? 'edit' : 'add';
+  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, type: 'hospitals', id: hospId ? parseInt(hospId) : null, data: itemData }) })
+  .then(r => r.json()).then(() => { closeHospitalModal(); loadVlastaCodebooks(); });
+}
+
+function deleteHospital(hospId) {
+  const hosp = ((vlastaData.codebooks && vlastaData.codebooks.hospitals) || []).find(h => h.id === hospId);
+  const hospName = hosp ? hosp.name : `#${hospId}`;
+  if (!confirm(`Opravdu si přejete smazat nemocnici ${hospName}?`)) return;
+  fetch(`/api/vlasta/codebooks`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'hospitals', id: hospId }) })
+  .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
 function renderMaterialTable(items) {
@@ -490,13 +608,13 @@ function renderAccessoriesTable(items) {
 
 function showAddCodebookModal(cbType) {
   if (cbType === 'technicians') { openTechnicianModal(null); return; }
-  const labels = { hospitals: 'Nemocnici', material: 'Materiál', accessories: 'Příslušenství' };
+  if (cbType === 'hospitals') { openHospitalModal(null); return; }
+  const labels = { material: 'Materiál', accessories: 'Příslušenství' };
   const val = prompt(`Přidat záznam do číselníku pro ${labels[cbType] || cbType}:\nZadejte hodnoty oddělené čárkou.`);
   if (!val) return;
   const parts = val.split(',').map(p => p.trim());
   let itemData = {};
-  if (cbType === 'hospitals') { itemData = { name: parts[0] || 'Nová Nemocnice', city: parts[1] || 'Brno', address: parts[2] || 'Hlavní 1', preferred_brand: parts[3] || 'Gallant', tender_status: 'Aktivní' }; }
-  else if (cbType === 'material') { itemData = { code: parts[0] || 'MAT-001', name: parts[1] || 'Nový Materiál', category: parts[2] || 'ICD', supplier: parts[3] || 'CARDION', warranty_months: 72 }; }
+  if (cbType === 'material') { itemData = { code: parts[0] || 'MAT-001', name: parts[1] || 'Nový Materiál', category: parts[2] || 'ICD', supplier: parts[3] || 'CARDION', warranty_months: 72 }; }
   else if (cbType === 'accessories') { itemData = { code: parts[0] || 'ACC-001', name: parts[1] || 'Nové Příslušenství', category: parts[2] || 'Elektrody', compat: parts[3] || 'Univerzální', stock_min: 10 }; }
 
   fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'add', type: cbType, data: itemData }) })
@@ -568,7 +686,6 @@ function processVlastaVoiceCommand() {
 
 document.addEventListener('DOMContentLoaded', () => { loadVlastaData(); loadVlastaCodebooks(); });
 """
-
 # =============================================================================
 # DATA STORAGE & TOOL FUNCTIONS
 # =============================================================================
@@ -616,10 +733,10 @@ def load_db():
                     { "id": 4, "name": "Jakub Střítecký", "email": "jakub.stritecky@cardion.cz", "phone": "+420 724 555 666", "status": "Aktivní", "absence_from": "", "absence_to": "" }
                 ],
                 "hospitals": [
-                    { "id": 1, "name": "FN Brno Bohunice", "city": "Brno", "address": "Jihlavská 20, Brno", "preferred_brand": "Quadra Assura MP / Fortify Assura", "tender_status": "Schválený tender 2026" },
-                    { "id": 2, "name": "FN USA BRNO", "city": "Brno", "address": "Pekařská 53, Brno", "preferred_brand": "Gallant HF / DR / VR", "tender_status": "Schválený tender 2026" },
-                    { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "preferred_brand": "Gallant / Fortify Assura", "tender_status": "Schválený tender 2026" },
-                    { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "preferred_brand": "Gallant / Durata 7122", "tender_status": "Schválený tender 2026" }
+                    { "id": 1, "name": "FN Brno Bohunice", "city": "Brno", "address": "Jihlavská 20, Brno", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" },
+                    { "id": 2, "name": "FN USA BRNO", "city": "Brno", "address": "Pekařská 53, Brno", "tender_start": "2026-03-01", "tender_duration_years": 2, "tender_end": "2028-03-01" },
+                    { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "tender_start": "2025-06-01", "tender_duration_years": 4, "tender_end": "2029-06-01" },
+                    { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" }
                 ],
                 "material": [
                     { "id": 1, "code": "PM3562", "name": "Quadra Allure MP™ CRT", "category": "CRT-D / ICD", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
