@@ -1228,6 +1228,32 @@ def add_item():
     )
     return jsonify(res)
 
+@app.route('/api/vlasta/implantations', methods=['GET', 'POST', 'DELETE'])
+def manage_implantations():
+    db = load_db()
+    if request.method == 'GET':
+        return jsonify({"implantations": db.get("implantations", [])})
+    elif request.method == 'POST':
+        req_json = request.get_json(force=True, silent=True) or {}
+        imp = req_json.get('implantation')
+        codebooks = req_json.get('codebooks')
+        if imp:
+            implantations = db.get("implantations", [])
+            implantations.insert(0, imp)
+            db["implantations"] = implantations
+        if codebooks:
+            db["codebooks"] = codebooks
+        db["logs"].append({"ts": datetime.now().isoformat(), "event": f"Zadána nová implantace {imp.get('id') if imp else ''}", "user": "System"})
+        save_db(db)
+        return jsonify({"ok": True, "implantations": db.get("implantations", []), "codebooks": db.get("codebooks", {})})
+    elif request.method == 'DELETE':
+        req_json = request.get_json(force=True, silent=True) or {}
+        imp_id = req_json.get('id')
+        if imp_id:
+            db["implantations"] = [i for i in db.get("implantations", []) if i.get("id") != imp_id]
+            save_db(db)
+        return jsonify({"ok": True})
+
 @app.route('/api/vlasta/parse-voice', methods=['POST'])
 def parse_voice():
     req_json = request.get_json(force=True, silent=True) or {}
