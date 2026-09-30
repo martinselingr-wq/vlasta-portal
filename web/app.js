@@ -1200,6 +1200,40 @@ function openEditImplantationModal(impId) {
   document.getElementById('imp-indication').value = imp.indication || '';
   document.getElementById('imp-location').value = imp.location || '';
 
+  // Pre-select matching MitraClip
+  const mitraclipSelect = document.getElementById('imp-mitraclip');
+  if (imp.mitraclip_name && imp.mitraclip_name !== '-') {
+    let foundOption = Array.from(mitraclipSelect.options).find(opt => opt.text.toLowerCase().includes(imp.mitraclip_name.toLowerCase()) || imp.mitraclip_name.toLowerCase().includes(opt.text.toLowerCase()));
+    if (!foundOption) {
+      const opt = document.createElement('option');
+      opt.value = `EXISTING:${imp.mitraclip_name}`;
+      opt.textContent = `Původně přiřazený: ${imp.mitraclip_name}`;
+      mitraclipSelect.insertBefore(opt, mitraclipSelect.options[1]);
+      mitraclipSelect.value = opt.value;
+    } else {
+      mitraclipSelect.value = foundOption.value;
+    }
+  } else {
+    mitraclipSelect.value = '';
+  }
+
+  // Pre-select matching TriClip
+  const triclipSelect = document.getElementById('imp-triclip');
+  if (imp.triclip_name && imp.triclip_name !== '-') {
+    let foundOption = Array.from(triclipSelect.options).find(opt => opt.text.toLowerCase().includes(imp.triclip_name.toLowerCase()) || imp.triclip_name.toLowerCase().includes(opt.text.toLowerCase()));
+    if (!foundOption) {
+      const opt = document.createElement('option');
+      opt.value = `EXISTING:${imp.triclip_name}`;
+      opt.textContent = `Původně přiřazený: ${imp.triclip_name}`;
+      triclipSelect.insertBefore(opt, triclipSelect.options[1]);
+      triclipSelect.value = opt.value;
+    } else {
+      triclipSelect.value = foundOption.value;
+    }
+  } else {
+    triclipSelect.value = '';
+  }
+
   // Select matching accessories checkboxes
   if (imp.accessories && Array.isArray(imp.accessories)) {
     const checkboxes = document.querySelectorAll('input[name="imp-acc-checkbox"]');
@@ -1312,17 +1346,25 @@ function saveNewImplantation() {
 
   let mitraclipName = '-';
   if (mitraclipId) {
-    const item = clipList.find(c => c.id === parseInt(mitraclipId));
-    if (item) {
-      mitraclipName = `${item.name} (${item.code})`;
+    if (mitraclipId.startsWith('EXISTING:')) {
+      mitraclipName = mitraclipId.replace('EXISTING:', '');
+    } else {
+      const item = clipList.find(c => c.id === parseInt(mitraclipId));
+      if (item) {
+        mitraclipName = `${item.name} (${item.code})`;
+      }
     }
   }
 
   let triclipName = '-';
   if (triclipId) {
-    const item = clipList.find(c => c.id === parseInt(triclipId));
-    if (item) {
-      triclipName = `${item.name} (${item.code})`;
+    if (triclipId.startsWith('EXISTING:')) {
+      triclipName = triclipId.replace('EXISTING:', '');
+    } else {
+      const item = clipList.find(c => c.id === parseInt(triclipId));
+      if (item) {
+        triclipName = `${item.name} (${item.code})`;
+      }
     }
   }
 
