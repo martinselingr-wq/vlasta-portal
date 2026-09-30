@@ -678,10 +678,12 @@ function renderClipTable(items) {
   tbody.innerHTML = html;
 }
 
-function updateClipFilterOptions() {
+function updateClipFilterOptions(resetInput = true) {
   const field = document.getElementById('filter-clip-field')?.value || 'all';
+  const inputEl = document.getElementById('filter-clip-input');
   const datalist = document.getElementById('filter-clip-datalist');
   const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  if (resetInput && inputEl) { inputEl.value = ''; const placeholders = { all: 'Vyberte ze seznamu / zadejte...', lot: 'Vyberte nebo zadejte LOT...', code: 'Vyberte nebo zadejte Kód...', location: 'Vyberte nebo zadejte Sklad...', name: 'Vyberte nebo zadejte Název...' }; inputEl.placeholder = placeholders[field] || 'Vyberte ze seznamu / zadejte...'; }
   if (!datalist) return;
   const optionsSet = new Set();
   clipList.forEach(c => {
@@ -783,10 +785,12 @@ function renderAccessoriesTable(items) {
   tbody.innerHTML = html;
 }
 
-function updateAccFilterOptions() {
+function updateAccFilterOptions(resetInput = true) {
   const field = document.getElementById('filter-acc-field')?.value || 'all';
+  const inputEl = document.getElementById('filter-acc-input');
   const datalist = document.getElementById('filter-acc-datalist');
   const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  if (resetInput && inputEl) { inputEl.value = ''; const placeholders = { all: 'Vyberte ze seznamu / zadejte...', lot: 'Vyberte nebo zadejte LOT...', code: 'Vyberte nebo zadejte Kód...', location: 'Vyberte nebo zadejte Sklad...', name: 'Vyberte nebo zadejte Název...' }; inputEl.placeholder = placeholders[field] || 'Vyberte ze seznamu / zadejte...'; }
   if (!datalist) return;
   const optionsSet = new Set();
   accList.forEach(a => {
