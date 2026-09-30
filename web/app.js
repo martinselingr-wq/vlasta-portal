@@ -71,6 +71,8 @@ function loadVlastaCodebooks() {
     renderHospitalsTable(data.hospitals || []);
     renderClipTable(data.clip || data.material || []);
     renderAccessoriesTable(data.accessories || []);
+    renderItemsTable();
+    renderDashboardStats();
   })
   .catch(err => {
     console.error('Chyba při načítání číselníků:', err);
@@ -614,20 +616,41 @@ function showAddCodebookModal(cbType) {
   if (cbType === 'accessories') { openAccessoryModal(null); return; }
 }
 
+function showAddItemModal() {
+  openClipModal(null);
+}
+
+function getAllRawItems() {
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  const standaloneItems = vlastaData.items || [];
+  
+  const raw = [
+    ...clipList.map(i => ({ ...i, category: 'Clip', quantity: parseInt(i.quantity) || 1 })),
+    ...accList.map(i => ({ ...i, category: 'Příslušenství', quantity: parseInt(i.quantity) || 1 })),
+    ...standaloneItems.map(i => ({ ...i, quantity: parseInt(i.quantity) || 1 }))
+  ];
+  return raw;
+}
+
 function renderDashboardStats() {
-  const items = vlastaData.items;
+  const items = getAllRawItems();
   const totalItems = items.length;
-  const totalQty = items.reduce((acc, i) => acc + (parseInt(i.quantity) || 0), 0);
+  const totalQty = items.reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
   
   const cats = {};
   items.forEach(i => {
     const c = i.category || 'Ostatní';
-    cats[c] = (cats[c] || 0) + 1;
+    cats[c] = (cats[c] || 0) + (parseInt(i.quantity) || 1);
   });
 
-  document.getElementById('stat-total-items').textContent = totalItems;
-  document.getElementById('stat-total-qty').textContent = `${totalQty} ks`;
-  document.getElementById('stat-categories-count').textContent = Object.keys(cats).length;
+  const elTotalItems = document.getElementById('stat-total-items');
+  const elTotalQty = document.getElementById('stat-total-qty');
+  const elCatCount = document.getElementById('stat-categories-count');
+
+  if (elTotalItems) elTotalItems.textContent = totalItems;
+  if (elTotalQty) elTotalQty.textContent = `${totalQty} ks`;
+  if (elCatCount) elCatCount.textContent = Object.keys(cats).length;
 
   renderRecentTable(items.slice(0, 5));
   renderCategoryChart(cats);
@@ -644,12 +667,12 @@ function renderRecentTable(recentItems) {
   recentItems.forEach(i => {
     html += `
       <tr>
-        <td><strong>${i.code}</strong></td>
-        <td>${i.name}</td>
-        <td><span class="badge-vlasta">${i.category}</span></td>
-        <td>${i.quantity} ks</td>
-        <td>${i.location}</td>
-        <td><span style="color:#10b981;">● ${i.status}</span></td>
+        <td><strong>${i.code || '-'}</strong></td>
+        <td>${i.name || '-'}</td>
+        <td><span class="badge-vlasta">${i.category || 'Clip/Příslušenství'}</span></td>
+        <td>${i.quantity || 1} ks</td>
+        <td>${i.location || '-'}</td>
+        <td><span style="color:#10b981;">● Aktivní</span></td>
       </tr>
     `;
   });
@@ -659,26 +682,85 @@ function renderRecentTable(recentItems) {
 function renderItemsTable() {
   const tbody = document.getElementById('all-items-body');
   if (!tbody) return;
-  const items = vlastaData.items;
-  if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné položky k zobrazení.</td></tr>';
+
+  const rawItems = getAllRawItems();
+  if (rawItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné evidované položky k zobrazení.</td></tr>';
     return;
   }
+
+  // Group items by Code or Name
+  const groups = {};
+  const today = new Date('2026-09-30'); // system date standard
+
+  rawItems.forEach(i => {
+    const key = i.code ? i.code.trim().toUpperCase() : (i.name || 'UNKNOWN').trim().toUpperCase();
+    if (!groups[key]) {
+      groups[key] = {
+        code: i.code || '-',
+        name: i.name || '-',
+        udi_di: i.udi_di || '-',
+        category: i.category || 'Clip',
+        locations: {},
+        totalQty: 0,
+        expiring90Qty: 0,
+        expiries: []
+      };
+    }
+    const g = groups[key];
+    const qty = parseInt(i.quantity) || 1;
+    g.totalQty += qty;
+
+    const loc = i.location || 'Nespecifikováno';
+    g.locations[loc] = (g.locations[loc] || 0) + qty;
+
+    if (i.expiry) {
+      g.expiries.push(i.expiry);
+      const expDate = new Date(i.expiry);
+      if (!isNaN(expDate.getTime())) {
+        const daysDiff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        if (daysDiff <= 90) {
+          g.expiring90Qty += qty;
+        }
+      }
+    }
+  });
+
   let html = '';
-  items.forEach(i => {
+  let rowIdx = 1;
+  Object.values(groups).forEach(g => {
+    // Breakdown of locations
+    const locArr = Object.entries(g.locations).map(([loc, count]) => `${loc} (${count} ks)`);
+    const locStr = locArr.join(', ');
+
+    // Expiration date (earliest)
+    g.expiries.sort();
+    const expiryStr = g.expiries.length > 0 ? g.expiries[0] : '-';
+
+    // 90-day expiry badge highlight
+    let expiry90Badge = '';
+    if (g.expiring90Qty > 0) {
+      expiry90Badge = `<span style="color:#ef4444; background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+        <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> ${g.expiring90Qty} ks (do 90 dní)
+      </span>`;
+    } else {
+      expiry90Badge = `<span style="color:#10b981; background:rgba(16, 185, 129, 0.1); padding:4px 10px; border-radius:6px; font-weight:600;">Ne (0 ks)</span>`;
+    }
+
     html += `
       <tr>
-        <td>#${i.id}</td>
-        <td><strong>${i.code}</strong></td>
-        <td>${i.name}</td>
-        <td><span class="badge-vlasta">${i.category}</span></td>
-        <td>${i.quantity} ks</td>
-        <td>${i.location}</td>
-        <td>${i.expiry || '-'}</td>
-        <td><span style="color:#10b981;">● ${i.status}</span></td>
+        <td>#${rowIdx++}</td>
+        <td><strong>${g.code}</strong></td>
+        <td>${g.name}</td>
+        <td><code style="background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:4px; font-family:monospace; color:#38bdf8;">${g.udi_di}</code></td>
+        <td><strong style="color:#38bdf8;">${g.totalQty} ks</strong></td>
+        <td>${locStr}</td>
+        <td>${expiryStr}</td>
+        <td>${expiry90Badge}</td>
       </tr>
     `;
   });
+
   tbody.innerHTML = html;
 }
 
@@ -706,8 +788,12 @@ function renderCategoryChart(cats) {
 
 function filterItems() {
   const q = document.getElementById('global-search').value.toLowerCase();
-  const filtered = vlastaData.items.filter(i => 
-    i.name.toLowerCase().includes(q) || i.code.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)
+  const rawItems = getAllRawItems();
+  const filtered = rawItems.filter(i => 
+    (i.name && i.name.toLowerCase().includes(q)) || 
+    (i.code && i.code.toLowerCase().includes(q)) || 
+    (i.category && i.category.toLowerCase().includes(q)) ||
+    (i.udi_di && i.udi_di.toLowerCase().includes(q))
   );
   renderRecentTable(filtered.slice(0, 5));
 }
