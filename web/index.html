@@ -263,6 +263,7 @@
                       <th>LOT</th>
                       <th>REF</th>
                       <th>Expirace</th>
+                      <th>Sklad</th>
                       <th style="text-align: right;">Akce</th>
                     </tr>
                   </thead>
@@ -292,6 +293,7 @@
                       <th>LOT</th>
                       <th>REF</th>
                       <th>Expirace</th>
+                      <th>Sklad</th>
                       <th style="text-align: right;">Akce</th>
                     </tr>
                   </thead>
@@ -479,6 +481,10 @@
           <label for="clip-expiry">Expirace</label>
           <input type="date" id="clip-expiry" class="modal-input">
         </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="clip-location">Sklad (Nemocnice / Technik)</label>
+          <select id="clip-location" class="modal-input"></select>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeClipModal()">Zrušit</button>
@@ -522,6 +528,10 @@
           <label for="acc-expiry">Expirace</label>
           <input type="date" id="acc-expiry" class="modal-input">
         </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="acc-location">Sklad (Nemocnice / Technik)</label>
+          <select id="acc-location" class="modal-input"></select>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeAccessoryModal()">Zrušit</button>
@@ -530,6 +540,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
