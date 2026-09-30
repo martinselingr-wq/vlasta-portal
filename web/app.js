@@ -78,6 +78,7 @@ function loadVlastaCodebooks() {
     renderAccessoriesTable(data.accessories || []);
     updateClipFilterOptions(false);
     updateAccFilterOptions(false);
+    updateItemsFilterOptions(false);
     renderItemsTable();
     renderImplantationsTable();
     renderDashboardStats();
@@ -844,6 +845,53 @@ function toggleExpiry90Filter() {
   renderItemsTable();
 }
 
+function updateItemsFilterOptions(resetInput = true) {
+  const field = document.getElementById('filter-items-field')?.value || 'all';
+  const inputEl = document.getElementById('filter-items-input');
+  const datalist = document.getElementById('filter-items-datalist');
+  const rawItems = getAllRawItems();
+
+  if (resetInput && inputEl) {
+    inputEl.value = '';
+    const placeholders = {
+      all: 'Vyberte ze seznamu / zadejte...',
+      udi: 'Vyberte nebo zadejte UDI-DI...',
+      code: 'Vyberte nebo zadejte Kód...',
+      location: 'Vyberte nebo zadejte Sklad...',
+      name: 'Vyberte nebo zadejte Název...'
+    };
+    inputEl.placeholder = placeholders[field] || 'Vyberte ze seznamu / zadejte...';
+  }
+
+  if (!datalist) return;
+
+  const optionsSet = new Set();
+  rawItems.forEach(i => {
+    if (field === 'udi' && i.udi_di) optionsSet.add(i.udi_di);
+    else if (field === 'code' && i.code) optionsSet.add(i.code);
+    else if (field === 'location' && i.location) optionsSet.add(i.location);
+    else if (field === 'name' && i.name) optionsSet.add(i.name);
+    else if (field === 'all') {
+      if (i.code) optionsSet.add(i.code);
+      if (i.name) optionsSet.add(i.name);
+      if (i.location) optionsSet.add(i.location);
+      if (i.udi_di) optionsSet.add(i.udi_di);
+    }
+  });
+
+  let optionsHtml = '';
+  optionsSet.forEach(opt => {
+    optionsHtml += `<option value="${opt}"></option>`;
+  });
+  datalist.innerHTML = optionsHtml;
+
+  filterItemsTable();
+}
+
+function filterItemsTable() {
+  renderItemsTable();
+}
+
 function renderItemsTable() {
   const tbody = document.getElementById('all-items-body');
   if (!tbody) return;
@@ -892,6 +940,26 @@ function renderItemsTable() {
   });
 
   let filteredGroups = Object.values(groups);
+
+  const filterField = document.getElementById('filter-items-field')?.value || 'all';
+  const filterQuery = (document.getElementById('filter-items-input')?.value || '').toLowerCase().trim();
+
+  if (filterQuery) {
+    filteredGroups = filteredGroups.filter(g => {
+      const locStr = Object.keys(g.locations).join(' ').toLowerCase();
+      if (filterField === 'udi') return g.udi_di && g.udi_di.toLowerCase().includes(filterQuery);
+      if (filterField === 'code') return g.code && g.code.toLowerCase().includes(filterQuery);
+      if (filterField === 'location') return locStr.includes(filterQuery);
+      if (filterField === 'name') return g.name && g.name.toLowerCase().includes(filterQuery);
+      return (
+        (g.code && g.code.toLowerCase().includes(filterQuery)) ||
+        (g.name && g.name.toLowerCase().includes(filterQuery)) ||
+        (g.udi_di && g.udi_di.toLowerCase().includes(filterQuery)) ||
+        locStr.includes(filterQuery)
+      );
+    });
+  }
+
   if (filterExpiry90Only) {
     filteredGroups = filteredGroups.filter(g => g.expiring90Qty > 0);
   }
