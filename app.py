@@ -58,6 +58,9 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <button class="nav-item" data-tab="items" onclick="switchTab('items')">
           <i class="fa-solid fa-list-check"></i><span>Evidované Položky</span>
         </button>
+        <button class="nav-item" data-tab="implantations" onclick="switchTab('implantations')">
+          <i class="fa-solid fa-heart-pulse"></i><span>Implantace</span>
+        </button>
         <button class="nav-item" data-tab="codebooks" onclick="switchTab('codebooks')">
           <i class="fa-solid fa-book-bookmark"></i><span>Číselníky</span>
         </button>
@@ -139,6 +142,32 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
               <table class="data-table">
                 <thead><tr><th>ID</th><th>Kód</th><th>Název Položky</th><th>UDI-DI</th><th>Celkem v ČR</th><th>Umístění / Sklad</th><th>Exspirace</th><th>Expirace do 90 dní</th></tr></thead>
                 <tbody id="all-items-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-pane" id="tab-implantations">
+        <div class="grid-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-notes-medical"></i> Seznam Realizovaných Implantací</h3>
+            <button class="btn-primary btn-sm" onclick="openNewImplantationModal()"><i class="fa-solid fa-plus"></i> Nová implantace</button>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Implantace</th>
+                    <th>Datum implantace</th>
+                    <th>Nemocnice</th>
+                    <th>Název (MitraClip)</th>
+                    <th>Název (TriClip)</th>
+                    <th style="text-align: right;">Akce</th>
+                  </tr>
+                </thead>
+                <tbody id="implantations-table-body"></tbody>
               </table>
             </div>
           </div>
@@ -453,6 +482,7 @@ window.switchTab = function(tabKey) {
   const titlesMap = {
     dashboard: { title: 'Hlavní Přehled', subtitle: 'Přehledná správa a řízení projektu VLASTA' },
     items: { title: 'Evidované Položky', subtitle: 'Detailní seznam všech položek v databázi VLASTA' },
+    implantations: { title: 'Implantace', subtitle: 'Evidence realizovaných zákroků MitraClip a TriClip' },
     codebooks: { title: 'Číselníky', subtitle: 'Správa kmenových dat: Technici, Nemocnice, Materiál, Příslušenství' },
     voice: { title: 'Hlasový Asistent Vlasta AI', subtitle: 'Zadávání a zpracování příkazů pomocí hlasového rozhraní' },
     analytics: { title: 'Analytika & Statistiky', subtitle: 'Systémový rozpad dat a přehledy aktivních kategorií' }
@@ -461,6 +491,7 @@ window.switchTab = function(tabKey) {
   tabPanes.forEach(pane => { if (pane.id === `tab-${tabKey}`) pane.classList.add('active'); else pane.classList.remove('active'); });
   if (titlesMap[tabKey] && pageTitle && pageSubtitle) { pageTitle.textContent = titlesMap[tabKey].title; pageSubtitle.textContent = titlesMap[tabKey].subtitle; }
   if (tabKey === 'codebooks') { loadVlastaCodebooks(); }
+  if (tabKey === 'implantations') { loadImplantations(); }
 };
 
 window.switchCodebookTab = function(cbKey) {
@@ -470,7 +501,7 @@ window.switchCodebookTab = function(cbKey) {
   panes.forEach(pane => { if (pane.id === `cb-pane-${cbKey}`) pane.classList.add('active'); else pane.classList.remove('active'); });
 };
 
-let vlastaData = { items: [], codebooks: {} };
+let vlastaData = { items: [], codebooks: {}, implantations: [] };
 
 function loadVlastaData() {
   fetch('/api/vlasta/items').then(r => r.json()).then(data => { vlastaData.items = data.items || []; renderDashboardStats(); renderItemsTable(); }).catch(err => console.error(err));
@@ -479,6 +510,7 @@ function loadVlastaData() {
 function loadVlastaCodebooks() {
   fetch('/api/vlasta/codebooks').then(r => r.json()).then(data => {
     vlastaData.codebooks = data || {};
+    if (data.implantations) vlastaData.implantations = data.implantations;
     renderTechniciansTable(data.technicians || []);
     renderHospitalsTable(data.hospitals || []);
     renderClipTable(data.clip || data.material || []);
@@ -486,8 +518,16 @@ function loadVlastaCodebooks() {
     updateClipFilterOptions();
     updateAccFilterOptions();
     renderItemsTable();
+    renderImplantationsTable();
     renderDashboardStats();
   }).catch(err => console.error(err));
+}
+
+function loadImplantations() {
+  fetch('/api/vlasta/implantations').then(r => r.json()).then(data => {
+    if (data && data.implantations) { vlastaData.implantations = data.implantations; }
+    renderImplantationsTable();
+  }).catch(err => { console.error(err); renderImplantationsTable(); });
 }
 
 function renderTechniciansTable(items) {
@@ -1103,8 +1143,41 @@ def load_db():
                     { "id": 5, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "udi_di": "(01) 05415067033446", "lot": "70315C1045", "ref": "DS2C019-U", "expiry": "2029-03-31" }
                 ]
             },
+            "implantations": [],
             "logs": []
         }
+
+    if "implantations" not in db or not db["implantations"]:
+        db["implantations"] = [
+            {
+              "id": "IMP-2026-001",
+              "date": "2026-09-28",
+              "hospital": "FNsP Ostrava Poruba",
+              "time_from": "09:30",
+              "time_to": "11:45",
+              "gender": "Muž",
+              "birth_date": "1958-04-12",
+              "mitraclip_name": "MitraClip™ G5 Delivery System XTW (CDS0802-XTW)",
+              "triclip_name": "-",
+              "accessories": ["MitraClip™ G5 Steerable Guide Catheter (SGC0802)"],
+              "indication": "Těžká sekundární mitrální regurgitace st. IV",
+              "location": "Segment A2/P2"
+            },
+            {
+              "id": "IMP-2026-002",
+              "date": "2026-09-29",
+              "hospital": "IKEM Praha",
+              "time_from": "13:00",
+              "time_to": "15:15",
+              "gender": "Žena",
+              "birth_date": "1964-11-03",
+              "mitraclip_name": "-",
+              "triclip_name": "TriClip™ G5 Delivery System XTW (TCDS0802-XTW)",
+              "accessories": ["TriClip™ G5 Steerable Guide Catheter (TSGC0802)", "Peel-Away Introducer 405120"],
+              "indication": "Těžká trikuspidální regurgitace",
+              "location": "Anteroseptální komisura"
+            }
+        ]
 
     if check_absence_expirations(db):
         save_db(db)
@@ -1184,7 +1257,9 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None, item_id=None):
     if action == "get":
         if cb_type and cb_type in codebooks:
             return {cb_type: codebooks[cb_type]}
-        return codebooks
+        res = dict(codebooks)
+        res["implantations"] = db.get("implantations", [])
+        return res
 
     if cb_type not in codebooks:
         return {"ok": False, "message": "Neplatný číselník"}
