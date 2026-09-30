@@ -153,7 +153,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <div class="cb-pane active" id="cb-pane-technicians">
           <div class="grid-card">
             <div class="card-header"><h3><i class="fa-solid fa-user-gear"></i> Číselník Technických Specialistů</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('technicians')"><i class="fa-solid fa-plus"></i> Přidat Technika</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Jméno a Příjmení</th><th>E-mail</th><th>Telefon</th><th>Region / Působnost</th><th>Stav</th></tr></thead><tbody id="cb-table-technicians"></tbody></table></div></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Jméno a Příjmení</th><th>E-mail</th><th>Telefon</th><th>Stav</th><th>Nepřítomnost (Od – Do)</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-technicians"></tbody></table></div></div>
           </div>
         </div>
 
@@ -205,6 +205,54 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
       </section>
     </main>
   </div>
+
+  <div id="technician-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tech-modal-title"><i class="fa-solid fa-user-gear"></i> Úprava Technika</h3>
+        <button class="modal-close" onclick="closeTechnicianModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tech-id">
+        <div class="form-group margin-bottom-sm">
+          <label>Jméno a Příjmení</label>
+          <input type="text" id="tech-name" class="modal-input" placeholder="např. Jan Novák">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>E-mail</label>
+          <input type="email" id="tech-email" class="modal-input" placeholder="novak@cardion.cz">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>Telefon</label>
+          <input type="text" id="tech-phone" class="modal-input" placeholder="+420 724 000 000">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label>Stav Technika</label>
+          <select id="tech-status" class="modal-input" onchange="toggleAbsenceFields()">
+            <option value="Aktivní">Aktivní</option>
+            <option value="Nepřítomnost">Nepřítomnost</option>
+          </select>
+        </div>
+        <div id="absence-range-container" class="form-group margin-bottom-sm" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label>Nepřítomnost Od</label>
+              <input type="date" id="tech-absence-from" class="modal-input">
+            </div>
+            <div>
+              <label>Nepřítomnost Do</label>
+              <input type="date" id="tech-absence-to" class="modal-input">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeTechnicianModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveTechnicianModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
@@ -281,6 +329,17 @@ body { font-family: var(--font-sans); background-color: var(--bg-dark); color: v
 .cb-tab-btn.active { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo)); color: #fff; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25); }
 .cb-pane { display: none; }
 .cb-pane.active { display: block; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(6px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.modal-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; width: 90%; max-width: 520px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+.modal-header h3 { font-family: var(--font-display); font-size: 19px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+.modal-close { background: transparent; border: none; font-size: 26px; color: var(--text-muted); cursor: pointer; }
+.modal-close:hover { color: #ef4444; }
+.modal-body label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.modal-input { width: 100%; padding: 10px 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 14px; margin-bottom: 12px; box-sizing: border-box; }
+.modal-input:focus { outline: none; border-color: var(--accent-cyan); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+.margin-bottom-sm { margin-bottom: 12px; }
 """
 
 EMBEDDED_APP_JS = """
@@ -328,10 +387,78 @@ function loadVlastaCodebooks() {
 function renderTechniciansTable(items) {
   const tbody = document.getElementById('cb-table-technicians');
   if (!tbody) return;
-  if (!items.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádní technici.</td></tr>'; return; }
+  if (!items || !items.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Žádní technici.</td></tr>'; return; }
   let html = '';
-  items.forEach(t => { html += `<tr><td>#${t.id}</td><td><strong>${t.name}</strong></td><td>${t.email}</td><td>${t.phone}</td><td><span class="badge-vlasta">${t.region}</span></td><td><span style="color:#10b981;">● ${t.status || 'Aktivní'}</span></td></tr>`; });
+  const todayStr = new Date().toISOString().split('T')[0];
+  items.forEach(t => {
+    let isAbsent = t.status === 'Nepřítomnost';
+    if (isAbsent && t.absence_to && todayStr > t.absence_to) {
+      isAbsent = false;
+    }
+    const statusBadge = isAbsent
+      ? `<span style="color:#f59e0b; font-weight:600;"><i class="fa-solid fa-circle-pause"></i> Nepřítomnost</span>`
+      : `<span style="color:#10b981; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Aktivní</span>`;
+    let absenceText = '-';
+    if (isAbsent && (t.absence_from || t.absence_to)) { absenceText = `<span style="color:#f59e0b;"><i class="fa-regular fa-calendar"></i> ${t.absence_from || '?'} do ${t.absence_to || '?'}</span>`; }
+    html += `<tr><td>#${t.id}</td><td><strong>${t.name}</strong></td><td>${t.email}</td><td>${t.phone}</td><td>${statusBadge}</td><td>${absenceText}</td><td style="text-align: right;"><button class="btn-secondary btn-sm" onclick="showEditTechnicianModal(${t.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button> <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteTechnician(${t.id})"><i class="fa-solid fa-trash"></i> Smazat</button></td></tr>`;
+  });
   tbody.innerHTML = html;
+}
+
+function openTechnicianModal(techId = null) {
+  const modal = document.getElementById('technician-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('tech-modal-title');
+  document.getElementById('tech-id').value = techId || '';
+  if (techId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-user-pen"></i> Úprava Technického Specialisty';
+    const tech = ((vlastaData.codebooks && vlastaData.codebooks.technicians) || []).find(t => t.id === techId);
+    if (tech) {
+      document.getElementById('tech-name').value = tech.name || '';
+      document.getElementById('tech-email').value = tech.email || '';
+      document.getElementById('tech-phone').value = tech.phone || '';
+      document.getElementById('tech-status').value = tech.status || 'Aktivní';
+      document.getElementById('tech-absence-from').value = tech.absence_from || '';
+      document.getElementById('tech-absence-to').value = tech.absence_to || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-user-plus"></i> Přidat Technického Specialistu';
+    document.getElementById('tech-name').value = '';
+    document.getElementById('tech-email').value = '';
+    document.getElementById('tech-phone').value = '';
+    document.getElementById('tech-status').value = 'Aktivní';
+    document.getElementById('tech-absence-from').value = '';
+    document.getElementById('tech-absence-to').value = '';
+  }
+  toggleAbsenceFields();
+  modal.style.display = 'flex';
+}
+
+function showEditTechnicianModal(techId) { openTechnicianModal(techId); }
+function closeTechnicianModal() { const modal = document.getElementById('technician-modal'); if (modal) modal.style.display = 'none'; }
+function toggleAbsenceFields() { const status = document.getElementById('tech-status').value; const container = document.getElementById('absence-range-container'); if (container) container.style.display = (status === 'Nepřítomnost') ? 'block' : 'none'; }
+
+function saveTechnicianModal() {
+  const techId = document.getElementById('tech-id').value;
+  const name = document.getElementById('tech-name').value.trim();
+  const email = document.getElementById('tech-email').value.trim();
+  const phone = document.getElementById('tech-phone').value.trim();
+  const status = document.getElementById('tech-status').value;
+  const absence_from = document.getElementById('tech-absence-from').value;
+  const absence_to = document.getElementById('tech-absence-to').value;
+  if (!name) { alert('Zadejte prosím jméno technika.'); return; }
+  const itemData = { name, email: email || 'technik@cardion.cz', phone: phone || '+420 724 000 000', status, absence_from: status === 'Nepřítomnost' ? absence_from : '', absence_to: status === 'Nepřítomnost' ? absence_to : '' };
+  const action = techId ? 'edit' : 'add';
+  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, type: 'technicians', id: techId ? parseInt(techId) : null, data: itemData }) })
+  .then(r => r.json()).then(() => { closeTechnicianModal(); loadVlastaCodebooks(); });
+}
+
+function deleteTechnician(techId) {
+  const tech = ((vlastaData.codebooks && vlastaData.codebooks.technicians) || []).find(t => t.id === techId);
+  const techName = tech ? tech.name : `#${techId}`;
+  if (!confirm(`Opravdu si přejete smazat technika ${techName}?`)) return;
+  fetch(`/api/vlasta/codebooks`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'technicians', id: techId }) })
+  .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
 function renderHospitalsTable(items) {
@@ -362,17 +489,17 @@ function renderAccessoriesTable(items) {
 }
 
 function showAddCodebookModal(cbType) {
-  const labels = { technicians: 'Technika', hospitals: 'Nemocnici', material: 'Materiál', accessories: 'Příslušenství' };
+  if (cbType === 'technicians') { openTechnicianModal(null); return; }
+  const labels = { hospitals: 'Nemocnici', material: 'Materiál', accessories: 'Příslušenství' };
   const val = prompt(`Přidat záznam do číselníku pro ${labels[cbType] || cbType}:\nZadejte hodnoty oddělené čárkou.`);
   if (!val) return;
   const parts = val.split(',').map(p => p.trim());
   let itemData = {};
-  if (cbType === 'technicians') { itemData = { name: parts[0] || 'Nový Technik', email: parts[1] || 'technik@cardion.cz', phone: parts[2] || '+420 724 000 000', region: parts[3] || 'ČR', status: 'Aktivní' }; }
-  else if (cbType === 'hospitals') { itemData = { name: parts[0] || 'Nová Nemocnice', city: parts[1] || 'Brno', address: parts[2] || 'Hlavní 1', preferred_brand: parts[3] || 'Gallant', tender_status: 'Aktivní' }; }
+  if (cbType === 'hospitals') { itemData = { name: parts[0] || 'Nová Nemocnice', city: parts[1] || 'Brno', address: parts[2] || 'Hlavní 1', preferred_brand: parts[3] || 'Gallant', tender_status: 'Aktivní' }; }
   else if (cbType === 'material') { itemData = { code: parts[0] || 'MAT-001', name: parts[1] || 'Nový Materiál', category: parts[2] || 'ICD', supplier: parts[3] || 'CARDION', warranty_months: 72 }; }
   else if (cbType === 'accessories') { itemData = { code: parts[0] || 'ACC-001', name: parts[1] || 'Nové Příslušenství', category: parts[2] || 'Elektrody', compat: parts[3] || 'Univerzální', stock_min: 10 }; }
 
-  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: cbType, data: itemData }) })
+  fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'add', type: cbType, data: itemData }) })
   .then(r => r.json()).then(() => loadVlastaCodebooks());
 }
 
@@ -446,42 +573,73 @@ document.addEventListener('DOMContentLoaded', () => { loadVlastaData(); loadVlas
 # DATA STORAGE & TOOL FUNCTIONS
 # =============================================================================
 
+def check_absence_expirations(db):
+    if not isinstance(db, dict):
+        return False
+    changed = False
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    technicians = db.get("codebooks", {}).get("technicians", [])
+    for t in technicians:
+        if t.get("status") == "Nepřítomnost" and t.get("absence_to"):
+            abs_to = str(t.get("absence_to")).strip()
+            if abs_to and today_str > abs_to:
+                prev_to = abs_to
+                t["status"] = "Aktivní"
+                t["absence_from"] = ""
+                t["absence_to"] = ""
+                changed = True
+                if "logs" not in db:
+                    db["logs"] = []
+                db["logs"].append({
+                    "ts": datetime.now().isoformat(),
+                    "event": f"Automatická změna stavu technika {t.get('name')} na 'Aktivní' (vypršela nepřítomnost platná do {prev_to})",
+                    "user": "System (Auto-Expiration)"
+                })
+    return changed
+
 def load_db():
+    db = None
     if os.path.exists(DB_FILE):
         try:
             with open(DB_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                db = json.load(f)
         except Exception as e:
             print(f"Chyba nacteni DB: {e}", flush=True)
-    return {
-        "items": [],
-        "codebooks": {
-            "technicians": [
-                { "id": 1, "name": "Jaroslav Černý", "email": "jaroslav.cerny@cardion.cz", "phone": "+420 724 111 222", "region": "Jihomoravský kraj", "status": "Aktivní" },
-                { "id": 2, "name": "Martin Selingr", "email": "martin.selingr@cardion.cz", "phone": "+420 724 528 085", "region": "Jihomoravský / Praha", "status": "Aktivní" },
-                { "id": 3, "name": "Henio (Henryk Szymeczek)", "email": "henio@cardion.cz", "phone": "+420 724 333 444", "region": "Moravskoslezský kraj", "status": "Aktivní" },
-                { "id": 4, "name": "Jakub Střítecký", "email": "jakub.stritecky@cardion.cz", "phone": "+420 724 555 666", "region": "Praha / Středočeský", "status": "Aktivní" }
-            ],
-            "hospitals": [
-                { "id": 1, "name": "FN Brno Bohunice", "city": "Brno", "address": "Jihlavská 20, Brno", "preferred_brand": "Quadra Assura MP / Fortify Assura", "tender_status": "Schválený tender 2026" },
-                { "id": 2, "name": "FN USA BRNO", "city": "Brno", "address": "Pekařská 53, Brno", "preferred_brand": "Gallant HF / DR / VR", "tender_status": "Schválený tender 2026" },
-                { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "preferred_brand": "Gallant / Fortify Assura", "tender_status": "Schválený tender 2026" },
-                { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "preferred_brand": "Gallant / Durata 7122", "tender_status": "Schválený tender 2026" }
-            ],
-            "material": [
-                { "id": 1, "code": "PM3562", "name": "Quadra Allure MP™ CRT", "category": "CRT-D / ICD", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
-                { "id": 2, "code": "CDDRA500Q", "name": "Gallant DR CDDRA500Q", "category": "Dvoudutinový ICD (DR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
-                { "id": 3, "code": "CD1359-40QC", "name": "Fortify Assura VR CD1359-40QC", "category": "Jednodutinový ICD (VR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 }
-            ],
-            "accessories": [
-                { "id": 1, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "category": "Elektrody", "compat": "Quadra Allure MP", "stock_min": 10 },
-                { "id": 2, "code": "405120", "name": "Peel-Away Introducer 405120", "category": "Zaváděcí katétry", "compat": "Univerzální", "stock_min": 25 },
-                { "id": 3, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "category": "Vodicí katétry", "compat": "Univerzální", "stock_min": 15 },
-                { "id": 4, "code": "DS2G002", "name": "CPS COURIER™ Guidewire medium 195 cm", "category": "Vodicí dráty", "compat": "Univerzální", "stock_min": 30 }
-            ]
-        },
-        "logs": []
-    }
+    if not db:
+        db = {
+            "items": [],
+            "codebooks": {
+                "technicians": [
+                    { "id": 1, "name": "Jaroslav Černý", "email": "jaroslav.cerny@cardion.cz", "phone": "+420 724 111 222", "status": "Aktivní", "absence_from": "", "absence_to": "" },
+                    { "id": 2, "name": "Martin Selingr", "email": "martin.selingr@cardion.cz", "phone": "+420 724 528 085", "status": "Nepřítomnost", "absence_from": "2026-10-01", "absence_to": "2026-10-15" },
+                    { "id": 3, "name": "Henio (Henryk Szymeczek)", "email": "henio@cardion.cz", "phone": "+420 724 333 444", "status": "Aktivní", "absence_from": "", "absence_to": "" },
+                    { "id": 4, "name": "Jakub Střítecký", "email": "jakub.stritecky@cardion.cz", "phone": "+420 724 555 666", "status": "Aktivní", "absence_from": "", "absence_to": "" }
+                ],
+                "hospitals": [
+                    { "id": 1, "name": "FN Brno Bohunice", "city": "Brno", "address": "Jihlavská 20, Brno", "preferred_brand": "Quadra Assura MP / Fortify Assura", "tender_status": "Schválený tender 2026" },
+                    { "id": 2, "name": "FN USA BRNO", "city": "Brno", "address": "Pekařská 53, Brno", "preferred_brand": "Gallant HF / DR / VR", "tender_status": "Schválený tender 2026" },
+                    { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "preferred_brand": "Gallant / Fortify Assura", "tender_status": "Schválený tender 2026" },
+                    { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "preferred_brand": "Gallant / Durata 7122", "tender_status": "Schválený tender 2026" }
+                ],
+                "material": [
+                    { "id": 1, "code": "PM3562", "name": "Quadra Allure MP™ CRT", "category": "CRT-D / ICD", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
+                    { "id": 2, "code": "CDDRA500Q", "name": "Gallant DR CDDRA500Q", "category": "Dvoudutinový ICD (DR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
+                    { "id": 3, "code": "CD1359-40QC", "name": "Fortify Assura VR CD1359-40QC", "category": "Jednodutinový ICD (VR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 }
+                ],
+                "accessories": [
+                    { "id": 1, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "category": "Elektrody", "compat": "Quadra Allure MP", "stock_min": 10 },
+                    { "id": 2, "code": "405120", "name": "Peel-Away Introducer 405120", "category": "Zaváděcí katétry", "compat": "Univerzální", "stock_min": 25 },
+                    { "id": 3, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "category": "Vodicí katétry", "compat": "Univerzální", "stock_min": 15 },
+                    { "id": 4, "code": "DS2G002", "name": "CPS COURIER™ Guidewire medium 195 cm", "category": "Vodicí dráty", "compat": "Univerzální", "stock_min": 30 }
+                ]
+            },
+            "logs": []
+        }
+
+    if check_absence_expirations(db):
+        save_db(db)
+
+    return db
 
 def save_db(db):
     try:
@@ -543,7 +701,7 @@ def tool_vlasta_statistiky():
         categories[cat] = categories.get(cat, 0) + 1
     return {"total_items": len(items), "total_quantity": total_qty, "categories_breakdown": categories, "last_updated": datetime.now().isoformat()}
 
-def tool_vlasta_codebooks(cb_type=None, action="get", data=None):
+def tool_vlasta_codebooks(cb_type=None, action="get", data=None, item_id=None):
     db = load_db()
     codebooks = db.get("codebooks", {
         "technicians": [],
@@ -555,8 +713,13 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None):
         if cb_type and cb_type in codebooks:
             return {cb_type: codebooks[cb_type]}
         return codebooks
-    if action == "add" and cb_type in codebooks and isinstance(data, dict):
-        current_list = codebooks[cb_type]
+
+    if cb_type not in codebooks:
+        return {"ok": False, "message": "Neplatný číselník"}
+
+    current_list = codebooks[cb_type]
+
+    if action == "add" and isinstance(data, dict):
         new_id = max([item.get("id", 0) for item in current_list] + [0]) + 1
         data["id"] = new_id
         current_list.append(data)
@@ -564,6 +727,32 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None):
         db["logs"].append({"ts": datetime.now().isoformat(), "event": f"Přidán záznam do číselníku {cb_type}: {data.get('name', 'Neznámý')}", "user": "System"})
         save_db(db)
         return {"ok": True, "item": data, "codebook": cb_type}
+
+    if action == "edit" and isinstance(data, dict):
+        target_id = item_id or data.get("id")
+        if target_id is not None:
+            target_id = int(target_id)
+            for idx, item in enumerate(current_list):
+                if item.get("id") == target_id:
+                    data["id"] = target_id
+                    current_list[idx] = data
+                    db["codebooks"] = codebooks
+                    db["logs"].append({"ts": datetime.now().isoformat(), "event": f"Upraven záznam #{target_id} v číselníku {cb_type}", "user": "System"})
+                    save_db(db)
+                    return {"ok": True, "item": data, "codebook": cb_type}
+        return {"ok": False, "message": "Záznam pro úpravu nenalezen"}
+
+    if action == "delete":
+        target_id = item_id or (data.get("id") if isinstance(data, dict) else None)
+        if target_id is not None:
+            target_id = int(target_id)
+            codebooks[cb_type] = [item for item in current_list if item.get("id") != target_id]
+            db["codebooks"] = codebooks
+            db["logs"].append({"ts": datetime.now().isoformat(), "event": f"Smazán záznam #{target_id} z číselníku {cb_type}", "user": "System"})
+            save_db(db)
+            return {"ok": True, "deleted_id": target_id, "codebook": cb_type}
+        return {"ok": False, "message": "Záznam pro smazání nenalezen"}
+
     return {"ok": False, "message": "Neplatný požadavek na číselník"}
 
 # =============================================================================
@@ -606,19 +795,26 @@ def get_stats():
     data = tool_vlasta_statistiky()
     return jsonify(data)
 
-@app.route('/api/vlasta/codebooks', methods=['GET'])
-def get_codebooks():
-    cb_type = request.args.get('type')
-    data = tool_vlasta_codebooks(cb_type=cb_type, action="get")
-    return jsonify(data)
-
-@app.route('/api/vlasta/codebooks', methods=['POST'])
-def add_codebook():
-    req_json = request.get_json(force=True, silent=True) or {}
-    cb_type = req_json.get('type')
-    item_data = req_json.get('data', {})
-    res = tool_vlasta_codebooks(cb_type=cb_type, action="add", data=item_data)
-    return jsonify(res)
+@app.route('/api/vlasta/codebooks', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_codebooks():
+    if request.method == 'GET':
+        cb_type = request.args.get('type')
+        data = tool_vlasta_codebooks(cb_type=cb_type, action="get")
+        return jsonify(data)
+    elif request.method == 'DELETE':
+        req_json = request.get_json(force=True, silent=True) or {}
+        cb_type = request.args.get('type') or req_json.get('type')
+        item_id = request.args.get('id') or req_json.get('id')
+        res = tool_vlasta_codebooks(cb_type=cb_type, action="delete", item_id=item_id)
+        return jsonify(res)
+    else:
+        req_json = request.get_json(force=True, silent=True) or {}
+        cb_type = req_json.get('type')
+        action = req_json.get('action', 'edit' if request.method == 'PUT' else 'add')
+        item_id = req_json.get('id')
+        item_data = req_json.get('data', {})
+        res = tool_vlasta_codebooks(cb_type=cb_type, action=action, data=item_data, item_id=item_id)
+        return jsonify(res)
 
 @app.route('/api/vlasta/items', methods=['POST'])
 def add_item():
