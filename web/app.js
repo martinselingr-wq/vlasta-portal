@@ -76,6 +76,8 @@ function loadVlastaCodebooks() {
     renderHospitalsTable(data.hospitals || []);
     renderClipTable(data.clip || data.material || []);
     renderAccessoriesTable(data.accessories || []);
+    updateClipFilterOptions();
+    updateAccFilterOptions();
     renderItemsTable();
     renderImplantationsTable();
     renderDashboardStats();
@@ -431,22 +433,61 @@ function renderClipTable(items) {
   tbody.innerHTML = html;
 }
 
+function updateClipFilterOptions() {
+  const field = document.getElementById('filter-clip-field')?.value || 'all';
+  const datalist = document.getElementById('filter-clip-datalist');
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  
+  if (!datalist) return;
+
+  const optionsSet = new Set();
+  clipList.forEach(c => {
+    if (field === 'lot' && c.lot) optionsSet.add(c.lot);
+    else if (field === 'code' && c.code) optionsSet.add(c.code);
+    else if (field === 'location' && c.location) optionsSet.add(c.location);
+    else if (field === 'name' && c.name) optionsSet.add(c.name);
+    else if (field === 'all') {
+      if (c.lot) optionsSet.add(c.lot);
+      if (c.code) optionsSet.add(c.code);
+      if (c.location) optionsSet.add(c.location);
+    }
+  });
+
+  let optionsHtml = '';
+  optionsSet.forEach(opt => {
+    optionsHtml += `<option value="${opt}"></option>`;
+  });
+  datalist.innerHTML = optionsHtml;
+
+  filterClipTable();
+}
+
 function filterClipTable() {
+  const field = document.getElementById('filter-clip-field')?.value || 'all';
   const q = (document.getElementById('filter-clip-input')?.value || '').toLowerCase().trim();
   const rawList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  
   if (!q) {
     renderClipTable(rawList);
     return;
   }
-  const filtered = rawList.filter(c => 
-    (c.code && c.code.toLowerCase().includes(q)) ||
-    (c.name && c.name.toLowerCase().includes(q)) ||
-    (c.udi_di && c.udi_di.toLowerCase().includes(q)) ||
-    (c.lot && c.lot.toLowerCase().includes(q)) ||
-    (c.ref && c.ref.toLowerCase().includes(q)) ||
-    (c.location && c.location.toLowerCase().includes(q)) ||
-    (c.id && String(c.id).includes(q))
-  );
+
+  const filtered = rawList.filter(c => {
+    if (field === 'lot') return c.lot && c.lot.toLowerCase().includes(q);
+    if (field === 'code') return c.code && c.code.toLowerCase().includes(q);
+    if (field === 'location') return c.location && c.location.toLowerCase().includes(q);
+    if (field === 'name') return c.name && c.name.toLowerCase().includes(q);
+    return (
+      (c.code && c.code.toLowerCase().includes(q)) ||
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.udi_di && c.udi_di.toLowerCase().includes(q)) ||
+      (c.lot && c.lot.toLowerCase().includes(q)) ||
+      (c.ref && c.ref.toLowerCase().includes(q)) ||
+      (c.location && c.location.toLowerCase().includes(q)) ||
+      (c.id && String(c.id).includes(q))
+    );
+  });
+
   renderClipTable(filtered);
 }
 
@@ -557,22 +598,61 @@ function renderAccessoriesTable(items) {
   tbody.innerHTML = html;
 }
 
+function updateAccFilterOptions() {
+  const field = document.getElementById('filter-acc-field')?.value || 'all';
+  const datalist = document.getElementById('filter-acc-datalist');
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  
+  if (!datalist) return;
+
+  const optionsSet = new Set();
+  accList.forEach(a => {
+    if (field === 'lot' && a.lot) optionsSet.add(a.lot);
+    else if (field === 'code' && a.code) optionsSet.add(a.code);
+    else if (field === 'location' && a.location) optionsSet.add(a.location);
+    else if (field === 'name' && a.name) optionsSet.add(a.name);
+    else if (field === 'all') {
+      if (a.lot) optionsSet.add(a.lot);
+      if (a.code) optionsSet.add(a.code);
+      if (a.location) optionsSet.add(a.location);
+    }
+  });
+
+  let optionsHtml = '';
+  optionsSet.forEach(opt => {
+    optionsHtml += `<option value="${opt}"></option>`;
+  });
+  datalist.innerHTML = optionsHtml;
+
+  filterAccessoriesTable();
+}
+
 function filterAccessoriesTable() {
+  const field = document.getElementById('filter-acc-field')?.value || 'all';
   const q = (document.getElementById('filter-acc-input')?.value || '').toLowerCase().trim();
   const rawList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  
   if (!q) {
     renderAccessoriesTable(rawList);
     return;
   }
-  const filtered = rawList.filter(a => 
-    (a.code && a.code.toLowerCase().includes(q)) ||
-    (a.name && a.name.toLowerCase().includes(q)) ||
-    (a.udi_di && a.udi_di.toLowerCase().includes(q)) ||
-    (a.lot && a.lot.toLowerCase().includes(q)) ||
-    (a.ref && a.ref.toLowerCase().includes(q)) ||
-    (a.location && a.location.toLowerCase().includes(q)) ||
-    (a.id && String(a.id).includes(q))
-  );
+
+  const filtered = rawList.filter(a => {
+    if (field === 'lot') return a.lot && a.lot.toLowerCase().includes(q);
+    if (field === 'code') return a.code && a.code.toLowerCase().includes(q);
+    if (field === 'location') return a.location && a.location.toLowerCase().includes(q);
+    if (field === 'name') return a.name && a.name.toLowerCase().includes(q);
+    return (
+      (a.code && a.code.toLowerCase().includes(q)) ||
+      (a.name && a.name.toLowerCase().includes(q)) ||
+      (a.udi_di && a.udi_di.toLowerCase().includes(q)) ||
+      (a.lot && a.lot.toLowerCase().includes(q)) ||
+      (a.ref && a.ref.toLowerCase().includes(q)) ||
+      (a.location && a.location.toLowerCase().includes(q)) ||
+      (a.id && String(a.id).includes(q))
+    );
+  });
+
   renderAccessoriesTable(filtered);
 }
 
