@@ -223,24 +223,141 @@ function deleteTechnician(techId) {
 function renderHospitalsTable(items) {
   const tbody = document.getElementById('cb-table-hospitals');
   if (!tbody) return;
-  if (!items.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádné nemocnice.</td></tr>';
+  if (!items || !items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné nemocnice.</td></tr>';
     return;
   }
   let html = '';
   items.forEach(h => {
+    const durationText = `${h.tender_duration_years || 1} ${h.tender_duration_years == 1 ? 'rok' : (h.tender_duration_years < 5 ? 'roky' : 'let')}`;
+    const tenderEndBadge = h.tender_end
+      ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-regular fa-calendar-check"></i> ${h.tender_end}</span>`
+      : '-';
+
     html += `
       <tr>
         <td>#${h.id}</td>
         <td><strong>${h.name}</strong></td>
         <td>${h.city}</td>
         <td>${h.address}</td>
-        <td><span class="badge-vlasta">${h.preferred_brand}</span></td>
-        <td><span style="color:#10b981;">● ${h.tender_status}</span></td>
+        <td>${h.tender_start || '-'}</td>
+        <td><span class="badge-vlasta">${durationText}</span></td>
+        <td>${tenderEndBadge}</td>
+        <td style="text-align: right;">
+          <button class="btn-secondary btn-sm" onclick="showEditHospitalModal(${h.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button>
+          <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteHospital(${h.id})"><i class="fa-solid fa-trash"></i> Smazat</button>
+        </td>
       </tr>
     `;
   });
   tbody.innerHTML = html;
+}
+
+function openHospitalModal(hospId = null) {
+  const modal = document.getElementById('hospital-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('hosp-modal-title');
+  document.getElementById('hosp-id').value = hospId || '';
+
+  if (hospId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-hospital-user"></i> Úprava Nemocnice / Kardiocentra';
+    const hosp = ((vlastaData.codebooks && vlastaData.codebooks.hospitals) || []).find(h => h.id === hospId);
+    if (hosp) {
+      document.getElementById('hosp-name').value = hosp.name || '';
+      document.getElementById('hosp-city').value = hosp.city || '';
+      document.getElementById('hosp-address').value = hosp.address || '';
+      document.getElementById('hosp-tender-start').value = hosp.tender_start || '';
+      document.getElementById('hosp-tender-duration').value = hosp.tender_duration_years || 3;
+      document.getElementById('hosp-tender-end').value = hosp.tender_end || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-hospital-square"></i> Přidat Nemocnici / Kardiocentrum';
+    document.getElementById('hosp-name').value = '';
+    document.getElementById('hosp-city').value = '';
+    document.getElementById('hosp-address').value = '';
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('hosp-tender-start').value = todayStr;
+    document.getElementById('hosp-tender-duration').value = 3;
+  }
+  calculateTenderEnd();
+  modal.style.display = 'flex';
+}
+
+function showEditHospitalModal(hospId) {
+  openHospitalModal(hospId);
+}
+
+function closeHospitalModal() {
+  const modal = document.getElementById('hospital-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function calculateTenderEnd() {
+  const startVal = document.getElementById('hosp-tender-start').value;
+  const durationYears = parseInt(document.getElementById('hosp-tender-duration').value) || 1;
+  const endInput = document.getElementById('hosp-tender-end');
+  if (!startVal) {
+    endInput.value = '';
+    return;
+  }
+  const parts = startVal.split('-');
+  if (parts.length === 3) {
+    const endYear = parseInt(parts[0]) + durationYears;
+    endInput.value = `${endYear}-${parts[1]}-${parts[2]}`;
+  }
+}
+
+function saveHospitalModal() {
+  const hospId = document.getElementById('hosp-id').value;
+  const name = document.getElementById('hosp-name').value.trim();
+  const city = document.getElementById('hosp-city').value.trim();
+  const address = document.getElementById('hosp-address').value.trim();
+  const tender_start = document.getElementById('hosp-tender-start').value;
+  const tender_duration_years = parseInt(document.getElementById('hosp-tender-duration').value) || 1;
+  const tender_end = document.getElementById('hosp-tender-end').value;
+
+  if (!name) { alert('Zadejte prosím název nemocnice.'); return; }
+
+  const itemData = {
+    name,
+    city: city || 'Brno',
+    address: address || 'Hlavní 1',
+    tender_start: tender_start || '2026-01-01',
+    tender_duration_years,
+    tender_end: tender_end || '2029-01-01'
+  };
+
+  const action = hospId ? 'edit' : 'add';
+  const payload = { action, type: 'hospitals', id: hospId ? parseInt(hospId) : null, data: itemData };
+
+  fetch('/api/vlasta/codebooks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    closeHospitalModal();
+    loadVlastaCodebooks();
+  })
+  .catch(err => alert('Chyba při ukládání: ' + err));
+}
+
+function deleteHospital(hospId) {
+  const hosp = ((vlastaData.codebooks && vlastaData.codebooks.hospitals) || []).find(h => h.id === hospId);
+  const hospName = hosp ? hosp.name : `#${hospId}`;
+  if (!confirm(`Opravdu si přejete smazat nemocnici ${hospName}?`)) return;
+
+  fetch(`/api/vlasta/codebooks`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'hospitals', id: hospId })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loadVlastaCodebooks();
+  })
+  .catch(err => alert('Chyba při mazání: ' + err));
 }
 
 function renderMaterialTable(items) {
@@ -294,8 +411,11 @@ function showAddCodebookModal(cbType) {
     openTechnicianModal(null);
     return;
   }
+  if (cbType === 'hospitals') {
+    openHospitalModal(null);
+    return;
+  }
   const labels = {
-    hospitals: 'Nemocnici (Název, Město, Adresa, Značka)',
     material: 'Materiál (Kód, Název, Kategorie, Dodavatel)',
     accessories: 'Příslušenství (Kód, Název, Kategorie, Kompatibilita)'
   };
