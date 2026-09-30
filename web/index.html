@@ -148,7 +148,19 @@
         <div class="grid-card">
           <div class="card-header">
             <h3><i class="fa-solid fa-boxes-stacked"></i> Evidované Položky v Projektu Vlasta</h3>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <select id="filter-items-field" onchange="updateItemsFilterOptions(true)" class="modal-input" style="padding: 7px 10px; width: 145px; font-size: 13px; margin:0;">
+                <option value="all">Filtruj vše</option>
+                <option value="udi">UDI-DI</option>
+                <option value="code">Kód materiálu</option>
+                <option value="location">Sklad / Pracoviště</option>
+                <option value="name">Název materiálu</option>
+              </select>
+              <div style="position: relative; display: flex; align-items: center;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i>
+                <input type="text" id="filter-items-input" list="filter-items-datalist" placeholder="Vyberte ze seznamu / zadejte..." oninput="filterItemsTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 220px;">
+                <datalist id="filter-items-datalist"></datalist>
+              </div>
               <button class="btn-danger btn-sm" id="btn-filter-expiry90" onclick="toggleExpiry90Filter()"><i class="fa-solid fa-triangle-exclamation"></i> Expirace 90 dní</button>
               <button class="btn-primary btn-sm" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
             </div>
@@ -710,6 +722,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=11.0"></script>
+  <script src="app.js?v=12.0"></script>
 </body>
 </html>
