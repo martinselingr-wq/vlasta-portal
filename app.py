@@ -1,6 +1,6 @@
 """
 =============================================================================
-PROJEKT VLASTA — Production Web Portal & REST API Server (Self-Contained)
+PROJEKT VLASTA — Production Web Portal & REST API Server (Flask)
 =============================================================================
 """
 
@@ -25,7 +25,7 @@ WEB_DIR = os.path.join(BASE_DIR, "web")
 DB_FILE = os.path.join(BASE_DIR, "database", "data.json")
 
 # =============================================================================
-# DATA STORAGE & TOOL FUNCTIONS (SELF-CONTAINED)
+# DATA STORAGE & TOOL FUNCTIONS
 # =============================================================================
 
 def load_db():
@@ -156,13 +156,17 @@ app = Flask(__name__, static_folder=WEB_DIR, static_url_path='')
 
 @app.route('/')
 def index():
-    return send_from_directory(WEB_DIR, 'index.html')
+    try:
+        return app.send_static_file('index.html')
+    except Exception as e:
+        return f"VLASTA Portal Running. Error serving index.html: {e}", 200
 
 @app.route('/<path:path>')
 def static_proxy(path):
-    if os.path.exists(os.path.join(WEB_DIR, path)):
-        return send_from_directory(WEB_DIR, path)
-    return send_from_directory(WEB_DIR, 'index.html')
+    try:
+        return app.send_static_file(path)
+    except Exception:
+        return app.send_static_file('index.html')
 
 @app.route('/api/vlasta/items', methods=['GET'])
 def get_items():
