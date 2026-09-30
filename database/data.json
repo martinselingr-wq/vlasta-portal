@@ -109,7 +109,8 @@
         "lot": "60402A1107",
         "ref": "CDS0802-XTW",
         "expiry": "2028-09-30",
-        "location": "FNsP Ostrava Poruba"
+        "location": "FNsP Ostrava Poruba",
+        "quantity": 2
       },
       {
         "id": 2,
@@ -118,8 +119,9 @@
         "udi_di": "(01) 05415067050861",
         "lot": "60401A1072",
         "ref": "CDS0802-XT",
-        "expiry": "2028-10-31",
-        "location": "FN Brno Bohunice"
+        "expiry": "2026-11-15",
+        "location": "FN Brno Bohunice",
+        "quantity": 2
       },
       {
         "id": 3,
@@ -129,7 +131,19 @@
         "lot": "60319R1082",
         "ref": "TCDS0802-XTW",
         "expiry": "2028-06-30",
-        "location": "Martin Selingr"
+        "location": "Martin Selingr",
+        "quantity": 1
+      },
+      {
+        "id": 4,
+        "code": "CDS0802-XTW",
+        "name": "MitraClip™ G5 Delivery System XTW",
+        "udi_di": "(01) 05415067050755",
+        "lot": "60402A1109",
+        "ref": "CDS0802-XTW",
+        "expiry": "2028-09-30",
+        "location": "IKEM Praha",
+        "quantity": 1
       }
     ],
     "accessories": [
@@ -141,7 +155,8 @@
         "lot": "60504R1045",
         "ref": "TSGC0802",
         "expiry": "2028-12-31",
-        "location": "FNsP Ostrava Poruba"
+        "location": "FNsP Ostrava Poruba",
+        "quantity": 3
       },
       {
         "id": 2,
@@ -150,8 +165,9 @@
         "udi_di": "(01) 05415067050823",
         "lot": "60317A2021",
         "ref": "SGC0802",
-        "expiry": "2028-11-30",
-        "location": "FNsP Ostrava Poruba"
+        "expiry": "2026-10-25",
+        "location": "FNsP Ostrava Poruba",
+        "quantity": 1
       },
       {
         "id": 3,
@@ -161,7 +177,8 @@
         "lot": "70123R2001",
         "ref": "1458Q-86",
         "expiry": "2029-01-31",
-        "location": "Jaroslav Černý"
+        "location": "Jaroslav Černý",
+        "quantity": 5
       },
       {
         "id": 4,
@@ -171,17 +188,30 @@
         "lot": "70211A3012",
         "ref": "PAI-405120",
         "expiry": "2028-08-31",
-        "location": "Hlavní sklad CARDION"
+        "location": "FN USA BRNO",
+        "quantity": 4
       },
       {
         "id": 5,
+        "code": "TSGC0802",
+        "name": "TriClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050892",
+        "lot": "60504R1046",
+        "ref": "TSGC0802",
+        "expiry": "2028-12-31",
+        "location": "Henio (Henryk Szymeczek)",
+        "quantity": 1
+      },
+      {
+        "id": 6,
         "code": "DS2C019",
         "name": "CPS Direct™ Universal DS2C019",
         "udi_di": "(01) 05415067033446",
         "lot": "70315C1045",
         "ref": "DS2C019-U",
         "expiry": "2029-03-31",
-        "location": "IKEM Praha"
+        "location": "IKEM Praha",
+        "quantity": 2
       }
     ]
   },
