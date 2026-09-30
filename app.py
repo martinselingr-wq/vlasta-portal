@@ -17,7 +17,7 @@ if hasattr(sys.stderr, 'reconfigure'):
     try: sys.stderr.reconfigure(encoding='utf-8', errors='replace')
     except Exception: pass
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request
 
 # Path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -152,21 +152,31 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None):
 # FLASK WEB SERVER APP
 # =============================================================================
 
-app = Flask(__name__, static_folder=WEB_DIR, static_url_path='')
+app = Flask(__name__)
 
 @app.route('/')
 def index():
-    try:
-        return app.send_static_file('index.html')
-    except Exception as e:
-        return f"VLASTA Portal Running. Error serving index.html: {e}", 200
+    idx_path = os.path.join(WEB_DIR, 'index.html')
+    if os.path.exists(idx_path):
+        with open(idx_path, 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return "<h1>VLASTA Portal Running</h1><p>Web folder loading fallback.</p>", 200, {'Content-Type': 'text/html; charset=utf-8'}
 
-@app.route('/<path:path>')
-def static_proxy(path):
-    try:
-        return app.send_static_file(path)
-    except Exception:
-        return app.send_static_file('index.html')
+@app.route('/styles.css')
+def styles():
+    css_path = os.path.join(WEB_DIR, 'styles.css')
+    if os.path.exists(css_path):
+        with open(css_path, 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/css; charset=utf-8'}
+    return "", 200, {'Content-Type': 'text/css'}
+
+@app.route('/app.js')
+def js():
+    js_path = os.path.join(WEB_DIR, 'app.js')
+    if os.path.exists(js_path):
+        with open(js_path, 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'application/javascript; charset=utf-8'}
+    return "", 200, {'Content-Type': 'application/javascript'}
 
 @app.route('/api/vlasta/items', methods=['GET'])
 def get_items():
