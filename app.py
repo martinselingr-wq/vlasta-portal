@@ -253,7 +253,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 </html>
 """
