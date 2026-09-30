@@ -169,14 +169,14 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
 
         <div class="cb-pane" id="cb-pane-clip">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div>
+            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><div style="display: flex; gap: 10px; align-items: center;"><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-clip-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterClipTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px;"></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div></div>
             <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-clip"></tbody></table></div></div>
           </div>
         </div>
 
         <div class="cb-pane" id="cb-pane-accessories">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div>
+            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><div style="display: flex; gap: 10px; align-items: center;"><div style="position: relative; display: flex; align-items: center;"><i class="fa-solid fa-filter" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i><input type="text" id="filter-acc-input" placeholder="Filtruj podle (LOT, Kód, Sklad...)" oninput="filterAccessoriesTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 250px;"></div><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div></div>
             <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th>Sklad</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
           </div>
         </div>
@@ -676,6 +676,14 @@ function renderClipTable(items) {
   tbody.innerHTML = html;
 }
 
+function filterClipTable() {
+  const q = (document.getElementById('filter-clip-input')?.value || '').toLowerCase().trim();
+  const rawList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
+  if (!q) { renderClipTable(rawList); return; }
+  const filtered = rawList.filter(c => (c.code && c.code.toLowerCase().includes(q)) || (c.name && c.name.toLowerCase().includes(q)) || (c.udi_di && c.udi_di.toLowerCase().includes(q)) || (c.lot && c.lot.toLowerCase().includes(q)) || (c.ref && c.ref.toLowerCase().includes(q)) || (c.location && c.location.toLowerCase().includes(q)) || (c.id && String(c.id).includes(q)));
+  renderClipTable(filtered);
+}
+
 function openClipModal(clipId = null) {
   const modal = document.getElementById('clip-modal');
   if (!modal) return;
@@ -746,6 +754,14 @@ function renderAccessoriesTable(items) {
     html += `<tr><td>#${a.id}</td><td><strong>${a.code || '-'}</strong></td><td>${a.name || '-'}</td><td><span class="badge-vlasta">${a.udi_di || '-'}</span></td><td>${a.lot || '-'}</td><td>${a.ref || '-'}</td><td>${a.expiry || '-'}</td><td>${locBadge}</td><td style="text-align: right;"><button class="btn-secondary btn-sm" onclick="showEditAccessoryModal(${a.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button> <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteAccessory(${a.id})"><i class="fa-solid fa-trash"></i> Smazat</button></td></tr>`;
   });
   tbody.innerHTML = html;
+}
+
+function filterAccessoriesTable() {
+  const q = (document.getElementById('filter-acc-input')?.value || '').toLowerCase().trim();
+  const rawList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
+  if (!q) { renderAccessoriesTable(rawList); return; }
+  const filtered = rawList.filter(a => (a.code && a.code.toLowerCase().includes(q)) || (a.name && a.name.toLowerCase().includes(q)) || (a.udi_di && a.udi_di.toLowerCase().includes(q)) || (a.lot && a.lot.toLowerCase().includes(q)) || (a.ref && a.ref.toLowerCase().includes(q)) || (a.location && a.location.toLowerCase().includes(q)) || (a.id && String(a.id).includes(q)));
+  renderAccessoriesTable(filtered);
 }
 
 function openAccessoryModal(accId = null) {
