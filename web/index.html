@@ -144,7 +144,10 @@
         <div class="grid-card">
           <div class="card-header">
             <h3><i class="fa-solid fa-boxes-stacked"></i> Evidované Položky v Projektu Vlasta</h3>
-            <button class="btn-primary btn-sm" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn-danger btn-sm" id="btn-filter-expiry90" onclick="toggleExpiry90Filter()"><i class="fa-solid fa-triangle-exclamation"></i> Expirace 90 dní</button>
+              <button class="btn-primary btn-sm" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
+            </div>
           </div>
           <div class="card-body">
             <div class="table-container">
