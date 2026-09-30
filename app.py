@@ -901,6 +901,12 @@ function renderItemsTable() {
     filteredGroups = filteredGroups.filter(g => g.expiring90Qty > 0);
   }
 
+  filteredGroups.sort((a, b) => {
+    const expA = a.expiries.length > 0 ? a.expiries.slice().sort()[0] : '9999-12-31';
+    const expB = b.expiries.length > 0 ? b.expiries.slice().sort()[0] : '9999-12-31';
+    return expA.localeCompare(expB);
+  });
+
   if (filteredGroups.length === 0) {
     tbody.innerHTML = filterExpiry90Only 
       ? '<tr><td colspan="8" style="text-align:center; padding: 25px; color: #f87171; font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Žádné položky nemají expiraci do 90 dní.</td></tr>'
