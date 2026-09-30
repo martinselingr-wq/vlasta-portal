@@ -132,6 +132,83 @@
         "expiry": "2026-11-20",
         "location": "Henio (Henryk Szymeczek)",
         "quantity": 1
+      },
+      {
+        "id": 6,
+        "code": "CDS0802-NT",
+        "name": "MitraClip™ G5 Delivery System NT",
+        "udi_di": "(01) 05415067050762",
+        "lot": "60408A1120",
+        "ref": "CDS0802-NT",
+        "expiry": "2026-11-05",
+        "location": "FN USA BRNO",
+        "quantity": 2
+      },
+      {
+        "id": 7,
+        "code": "TCDS0802-XT",
+        "name": "TriClip™ G5 Delivery System XT",
+        "udi_di": "(01) 05415067050793",
+        "lot": "60322R1095",
+        "ref": "TCDS0802-XT",
+        "expiry": "2027-04-30",
+        "location": "FNsP Ostrava Poruba",
+        "quantity": 3
+      },
+      {
+        "id": 8,
+        "code": "CDS0802-XTW",
+        "name": "MitraClip™ G5 Delivery System XTW",
+        "udi_di": "(01) 05415067050755",
+        "lot": "60402A1115",
+        "ref": "CDS0802-XTW",
+        "expiry": "2026-10-30",
+        "location": "Jaroslav Černý",
+        "quantity": 1
+      },
+      {
+        "id": 9,
+        "code": "CDS0802-XT",
+        "name": "MitraClip™ G5 Delivery System XT",
+        "udi_di": "(01) 05415067050861",
+        "lot": "60401A1088",
+        "ref": "CDS0802-XT",
+        "expiry": "2028-01-15",
+        "location": "Jakub Střítecký",
+        "quantity": 2
+      },
+      {
+        "id": 10,
+        "code": "TCDS0802-XTW",
+        "name": "TriClip™ G5 Delivery System XTW",
+        "udi_di": "(01) 05415067050786",
+        "lot": "60319R1102",
+        "ref": "TCDS0802-XTW",
+        "expiry": "2026-12-10",
+        "location": "IKEM Praha",
+        "quantity": 2
+      },
+      {
+        "id": 11,
+        "code": "CDS0802-NTW",
+        "name": "MitraClip™ G5 Delivery System NTW",
+        "udi_di": "(01) 05415067050779",
+        "lot": "60405B2033",
+        "ref": "CDS0802-NTW",
+        "expiry": "2027-08-20",
+        "location": "FN Brno Bohunice",
+        "quantity": 3
+      },
+      {
+        "id": 12,
+        "code": "CDS0802-XTW",
+        "name": "MitraClip™ G5 Delivery System XTW",
+        "udi_di": "(01) 05415067050755",
+        "lot": "60402A1125",
+        "ref": "CDS0802-XTW",
+        "expiry": "2028-11-15",
+        "location": "Hlavní sklad CARDION",
+        "quantity": 5
       }
     ],
     "accessories": [
@@ -211,6 +288,94 @@
         "expiry": "2026-12-05",
         "location": "IKEM Praha",
         "quantity": 2
+      },
+      {
+        "id": 8,
+        "code": "SGC0802",
+        "name": "MitraClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050823",
+        "lot": "60317A2030",
+        "ref": "SGC0802",
+        "expiry": "2026-11-15",
+        "location": "FN Brno Bohunice",
+        "quantity": 2
+      },
+      {
+        "id": 9,
+        "code": "TSGC0802",
+        "name": "TriClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050892",
+        "lot": "60504R1050",
+        "ref": "TSGC0802",
+        "expiry": "2027-03-31",
+        "location": "FN USA BRNO",
+        "quantity": 2
+      },
+      {
+        "id": 10,
+        "code": "405120",
+        "name": "Peel-Away Introducer 405120",
+        "udi_di": "(01) 05415067022335",
+        "lot": "70211A3025",
+        "ref": "PAI-405120",
+        "expiry": "2026-10-18",
+        "location": "Jakub Střítecký",
+        "quantity": 3
+      },
+      {
+        "id": 11,
+        "code": "1458Q",
+        "name": "Quartet™ 86 cm Elektroda",
+        "udi_di": "(01) 05415067011224",
+        "lot": "70123R2012",
+        "ref": "1458Q-86",
+        "expiry": "2028-05-15",
+        "location": "IKEM Praha",
+        "quantity": 4
+      },
+      {
+        "id": 12,
+        "code": "DS2C019",
+        "name": "CPS Direct™ Universal DS2C019",
+        "udi_di": "(01) 05415067033446",
+        "lot": "70315C1060",
+        "ref": "DS2C019-U",
+        "expiry": "2027-09-30",
+        "location": "FNsP Ostrava Poruba",
+        "quantity": 2
+      },
+      {
+        "id": 13,
+        "code": "SGC0802",
+        "name": "MitraClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050823",
+        "lot": "60317A2045",
+        "ref": "SGC0802",
+        "expiry": "2028-04-10",
+        "location": "Martin Selingr",
+        "quantity": 2
+      },
+      {
+        "id": 14,
+        "code": "VST-100",
+        "name": "V-Catcher Stabilizační Set G5",
+        "udi_di": "(01) 05415067088123",
+        "lot": "80105V1002",
+        "ref": "VST-100-G5",
+        "expiry": "2026-11-30",
+        "location": "FN Brno Bohunice",
+        "quantity": 3
+      },
+      {
+        "id": 15,
+        "code": "TSGC0802",
+        "name": "TriClip™ G5 Steerable Guide Catheter",
+        "udi_di": "(01) 05415067050892",
+        "lot": "60504R1062",
+        "ref": "TSGC0802",
+        "expiry": "2028-10-15",
+        "location": "Hlavní sklad CARDION",
+        "quantity": 4
       }
     ]
   },
@@ -225,7 +390,9 @@
       "birth_date": "1958-04-12",
       "mitraclip_name": "MitraClip™ G5 Delivery System XTW (CDS0802-XTW)",
       "triclip_name": "-",
-      "accessories": ["MitraClip™ G5 Steerable Guide Catheter (SGC0802)"],
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)"
+      ],
       "indication": "Těžká sekundární mitrální regurgitace st. IV",
       "location": "Segment A2/P2"
     },
@@ -239,8 +406,142 @@
       "birth_date": "1964-11-03",
       "mitraclip_name": "-",
       "triclip_name": "TriClip™ G5 Delivery System XTW (TCDS0802-XTW)",
-      "accessories": ["TriClip™ G5 Steerable Guide Catheter (TSGC0802)", "Peel-Away Introducer 405120"],
+      "accessories": [
+        "TriClip™ G5 Steerable Guide Catheter (TSGC0802)",
+        "Peel-Away Introducer 405120"
+      ],
       "indication": "Těžká trikuspidální regurgitace",
+      "location": "Anteroseptální komisura"
+    },
+    {
+      "id": "IMP-2026-003",
+      "date": "2026-01-14",
+      "hospital": "FN Brno Bohunice",
+      "time_from": "08:30",
+      "time_to": "11:15",
+      "gender": "Muž",
+      "birth_date": "1952-07-21",
+      "mitraclip_name": "MitraClip™ G5 Delivery System XT (CDS0802-XT)",
+      "triclip_name": "-",
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)"
+      ],
+      "indication": "Těžká primární degenerativní mitrální regurgitace st. IV",
+      "location": "Segment A2/P2"
+    },
+    {
+      "id": "IMP-2026-004",
+      "date": "2026-02-25",
+      "hospital": "IKEM Praha",
+      "time_from": "10:00",
+      "time_to": "12:30",
+      "gender": "Žena",
+      "birth_date": "1947-03-15",
+      "mitraclip_name": "MitraClip™ G5 Delivery System NTW (CDS0802-NTW)",
+      "triclip_name": "-",
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)"
+      ],
+      "indication": "Funkční mitrální regurgitace při ischemické KMP",
+      "location": "Komisura A1/P1"
+    },
+    {
+      "id": "IMP-2026-005",
+      "date": "2026-03-18",
+      "hospital": "FN USA BRNO",
+      "time_from": "11:30",
+      "time_to": "14:00",
+      "gender": "Muž",
+      "birth_date": "1961-12-05",
+      "mitraclip_name": "-",
+      "triclip_name": "TriClip™ G5 Delivery System XT (TCDS0802-XT)",
+      "accessories": [
+        "TriClip™ G5 Steerable Guide Catheter (TSGC0802)",
+        "Peel-Away Introducer 405120"
+      ],
+      "indication": "Těžká trikuspidální regurgitace při anuloektázii",
+      "location": "Anteroseptální komisura"
+    },
+    {
+      "id": "IMP-2026-006",
+      "date": "2026-04-12",
+      "hospital": "FNsP Ostrava Poruba",
+      "time_from": "09:00",
+      "time_to": "11:45",
+      "gender": "Žena",
+      "birth_date": "1955-09-28",
+      "mitraclip_name": "MitraClip™ G5 Delivery System XTW (CDS0802-XTW)",
+      "triclip_name": "-",
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)"
+      ],
+      "indication": "Závažná mitrální regurgitace po AMI",
+      "location": "Segment P2/P3"
+    },
+    {
+      "id": "IMP-2026-007",
+      "date": "2026-05-30",
+      "hospital": "FN Brno Bohunice",
+      "time_from": "13:30",
+      "time_to": "16:00",
+      "gender": "Muž",
+      "birth_date": "1966-02-18",
+      "mitraclip_name": "-",
+      "triclip_name": "TriClip™ G5 Delivery System XTW (TCDS0802-XTW)",
+      "accessories": [
+        "TriClip™ G5 Steerable Guide Catheter (TSGC0802)"
+      ],
+      "indication": "Těžká symptomatická TR",
+      "location": "Posteroseptální komisura"
+    },
+    {
+      "id": "IMP-2026-008",
+      "date": "2026-06-22",
+      "hospital": "IKEM Praha",
+      "time_from": "08:45",
+      "time_to": "11:30",
+      "gender": "Muž",
+      "birth_date": "1950-10-10",
+      "mitraclip_name": "MitraClip™ G5 Delivery System XT (CDS0802-XT)",
+      "triclip_name": "-",
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)",
+        "CPS Direct™ Universal DS2C019"
+      ],
+      "indication": "Sekundární MR se selháváním levé komory",
+      "location": "Segment A2/P2"
+    },
+    {
+      "id": "IMP-2026-009",
+      "date": "2026-07-19",
+      "hospital": "FN USA BRNO",
+      "time_from": "10:15",
+      "time_to": "12:45",
+      "gender": "Žena",
+      "birth_date": "1959-05-04",
+      "mitraclip_name": "MitraClip™ G5 Delivery System NT (CDS0802-NT)",
+      "triclip_name": "-",
+      "accessories": [
+        "MitraClip™ G5 Steerable Guide Catheter (SGC0802)"
+      ],
+      "indication": "Degenerativní MR st. III-IV",
+      "location": "Segment A3/P3"
+    },
+    {
+      "id": "IMP-2026-010",
+      "date": "2026-08-14",
+      "hospital": "FNsP Ostrava Poruba",
+      "time_from": "12:00",
+      "time_to": "14:30",
+      "gender": "Muž",
+      "birth_date": "1963-08-30",
+      "mitraclip_name": "-",
+      "triclip_name": "TriClip™ G5 Delivery System XT (TCDS0802-XT)",
+      "accessories": [
+        "TriClip™ G5 Steerable Guide Catheter (TSGC0802)",
+        "Peel-Away Introducer 405120"
+      ],
+      "indication": "Symptomatická těžká tricuspidální regurgitace",
       "location": "Anteroseptální komisura"
     }
   ],
@@ -248,6 +549,11 @@
     {
       "ts": "2026-09-30T15:06:00",
       "event": "Přidána položka Sklad s dynamickým výběrem Nemocnic a Techníků",
+      "user": "AGY"
+    },
+    {
+      "ts": "2026-09-30T21:54:00",
+      "event": "Přidány implantace za rok 2026 a rozšířen číselník materiálu Clip a Příslušenství",
       "user": "AGY"
     }
   ]
