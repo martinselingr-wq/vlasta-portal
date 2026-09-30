@@ -1,0 +1,167 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "code": "VLS-1001",
+      "name": "Vlasta Modul Alpha",
+      "category": "Materiál",
+      "status": "Aktivní",
+      "location": "Hlavní sklad",
+      "quantity": 25,
+      "expiry": "2027-06-30",
+      "created_at": "2026-09-30T14:00:00"
+    },
+    {
+      "id": 2,
+      "code": "VLS-1002",
+      "name": "Vlasta Modul Beta",
+      "category": "Příslušenství",
+      "status": "Aktivní",
+      "location": "Středisko 1",
+      "quantity": 14,
+      "expiry": "2026-11-15",
+      "created_at": "2026-09-30T14:15:00"
+    }
+  ],
+  "codebooks": {
+    "technicians": [
+      {
+        "id": 1,
+        "name": "Jaroslav Černý",
+        "email": "jaroslav.cerny@cardion.cz",
+        "phone": "+420 724 111 222",
+        "status": "Aktivní",
+        "absence_from": "",
+        "absence_to": ""
+      },
+      {
+        "id": 2,
+        "name": "Martin Selingr",
+        "email": "martin.selingr@cardion.cz",
+        "phone": "+420 724 528 085",
+        "status": "Nepřítomnost",
+        "absence_from": "2026-10-01",
+        "absence_to": "2026-10-15"
+      },
+      {
+        "id": 3,
+        "name": "Henio (Henryk Szymeczek)",
+        "email": "henio@cardion.cz",
+        "phone": "+420 724 333 444",
+        "status": "Aktivní",
+        "absence_from": "",
+        "absence_to": ""
+      },
+      {
+        "id": 4,
+        "name": "Jakub Střítecký",
+        "email": "jakub.stritecky@cardion.cz",
+        "phone": "+420 724 555 666",
+        "status": "Aktivní",
+        "absence_from": "",
+        "absence_to": ""
+      }
+    ],
+    "hospitals": [
+      {
+        "id": 1,
+        "name": "FN Brno Bohunice",
+        "city": "Brno",
+        "address": "Jihlavská 20, Brno",
+        "preferred_brand": "Quadra Assura MP / Fortify Assura",
+        "tender_status": "Schválený tender 2026"
+      },
+      {
+        "id": 2,
+        "name": "FN USA BRNO",
+        "city": "Brno",
+        "address": "Pekařská 53, Brno",
+        "preferred_brand": "Gallant HF / DR / VR",
+        "tender_status": "Schválený tender 2026"
+      },
+      {
+        "id": 3,
+        "name": "IKEM Praha",
+        "city": "Praha",
+        "address": "Vídeňská 1958/9, Praha 4",
+        "preferred_brand": "Gallant / Fortify Assura",
+        "tender_status": "Schválený tender 2026"
+      },
+      {
+        "id": 4,
+        "name": "FNsP Ostrava Poruba",
+        "city": "Ostrava",
+        "address": "17. listopadu 1790/5, Ostrava",
+        "preferred_brand": "Gallant / Durata 7122",
+        "tender_status": "Schválený tender 2026"
+      }
+    ],
+    "material": [
+      {
+        "id": 1,
+        "code": "PM3562",
+        "name": "Quadra Allure MP™ CRT",
+        "category": "CRT-D / ICD",
+        "supplier": "CARDION s.r.o.",
+        "warranty_months": 72
+      },
+      {
+        "id": 2,
+        "code": "CDDRA500Q",
+        "name": "Gallant DR CDDRA500Q",
+        "category": "Dvoudutinový ICD (DR)",
+        "supplier": "CARDION s.r.o.",
+        "warranty_months": 72
+      },
+      {
+        "id": 3,
+        "code": "CD1359-40QC",
+        "name": "Fortify Assura VR CD1359-40QC",
+        "category": "Jednodutinový ICD (VR)",
+        "supplier": "CARDION s.r.o.",
+        "warranty_months": 72
+      }
+    ],
+    "accessories": [
+      {
+        "id": 1,
+        "code": "1458Q",
+        "name": "Quartet™ 86 cm Elektroda",
+        "category": "Elektrody",
+        "compat": "Quadra Allure MP",
+        "stock_min": 10
+      },
+      {
+        "id": 2,
+        "code": "405120",
+        "name": "Peel-Away Introducer 405120",
+        "category": "Zaváděcí katétry",
+        "compat": "Univerzální",
+        "stock_min": 25
+      },
+      {
+        "id": 3,
+        "code": "DS2C019",
+        "name": "CPS Direct™ Universal DS2C019",
+        "category": "Vodicí katétry",
+        "compat": "Univerzální",
+        "stock_min": 15
+      },
+      {
+        "id": 4,
+        "code": "DS2G002",
+        "name": "CPS COURIER™ Guidewire medium 195 cm",
+        "category": "Vodicí dráty",
+        "compat": "Univerzální",
+        "stock_min": 30
+      }
+    ]
+  },
+  "logs": [
+    {
+      "ts": "2026-09-30T15:06:00",
+      "event": "Číselníky VLASTA vytvořeny (Technici, Nemocnice, Materiál, Příslušenství)",
+      "user": "AGY"
+    }
+  ]
+}
