@@ -1179,6 +1179,27 @@ function editImplantationFromDetail() {
   openEditImplantationModal(impId);
 }
 
+function findMatchingClipOption(selectEl, clipName) {
+  if (!selectEl || !clipName || clipName === '-') return null;
+  const options = Array.from(selectEl.options);
+  
+  const codeMatch = clipName.match(/\(([^)]+)\)/);
+  const code = codeMatch ? codeMatch[1].replace('Kód:', '').trim() : '';
+
+  if (code) {
+    const matchByCode = options.find(opt => opt.text.toLowerCase().includes(code.toLowerCase()));
+    if (matchByCode) return matchByCode;
+  }
+
+  const cleanName = clipName.split('(')[0].trim().toLowerCase();
+  if (cleanName) {
+    const matchByName = options.find(opt => opt.text.toLowerCase().includes(cleanName));
+    if (matchByName) return matchByName;
+  }
+
+  return null;
+}
+
 function openEditImplantationModal(impId) {
   const imp = (vlastaData.implantations || []).find(i => i.id === impId);
   if (!imp) return;
@@ -1203,7 +1224,7 @@ function openEditImplantationModal(impId) {
   // Pre-select matching MitraClip
   const mitraclipSelect = document.getElementById('imp-mitraclip');
   if (imp.mitraclip_name && imp.mitraclip_name !== '-') {
-    let foundOption = Array.from(mitraclipSelect.options).find(opt => opt.text.toLowerCase().includes(imp.mitraclip_name.toLowerCase()) || imp.mitraclip_name.toLowerCase().includes(opt.text.toLowerCase()));
+    let foundOption = findMatchingClipOption(mitraclipSelect, imp.mitraclip_name);
     if (!foundOption) {
       const opt = document.createElement('option');
       opt.value = `EXISTING:${imp.mitraclip_name}`;
@@ -1220,7 +1241,7 @@ function openEditImplantationModal(impId) {
   // Pre-select matching TriClip
   const triclipSelect = document.getElementById('imp-triclip');
   if (imp.triclip_name && imp.triclip_name !== '-') {
-    let foundOption = Array.from(triclipSelect.options).find(opt => opt.text.toLowerCase().includes(imp.triclip_name.toLowerCase()) || imp.triclip_name.toLowerCase().includes(opt.text.toLowerCase()));
+    let foundOption = findMatchingClipOption(triclipSelect, imp.triclip_name);
     if (!foundOption) {
       const opt = document.createElement('option');
       opt.value = `EXISTING:${imp.triclip_name}`;
