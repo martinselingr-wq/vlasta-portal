@@ -146,7 +146,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <div class="codebook-header-tabs margin-bottom-md">
           <button class="cb-tab-btn active" data-cb="technicians" onclick="switchCodebookTab('technicians')"><i class="fa-solid fa-user-gear"></i> Technici</button>
           <button class="cb-tab-btn" data-cb="hospitals" onclick="switchCodebookTab('hospitals')"><i class="fa-solid fa-hospital"></i> Nemocnice</button>
-          <button class="cb-tab-btn" data-cb="material" onclick="switchCodebookTab('material')"><i class="fa-solid fa-heart-pulse"></i> Materiál</button>
+          <button class="cb-tab-btn" data-cb="clip" onclick="switchCodebookTab('clip')"><i class="fa-solid fa-heart-pulse"></i> Clip</button>
           <button class="cb-tab-btn" data-cb="accessories" onclick="switchCodebookTab('accessories')"><i class="fa-solid fa-plug-circle-bolt"></i> Příslušenství</button>
         </div>
 
@@ -164,17 +164,17 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
           </div>
         </div>
 
-        <div class="cb-pane" id="cb-pane-material">
+        <div class="cb-pane" id="cb-pane-clip">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Implantabilního Materiálu (CRT/ICD/Pacemakery)</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('material')"><i class="fa-solid fa-plus"></i> Přidat Materiál</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>Kategorie</th><th>Dodavatel</th><th>Záruka (měs.)</th></tr></thead><tbody id="cb-table-material"></tbody></table></div></div>
+            <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Číselník Clip (MitraClip / TriClip)</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('clip')"><i class="fa-solid fa-plus"></i> Přidat Clip</button></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-clip"></tbody></table></div></div>
           </div>
         </div>
 
         <div class="cb-pane" id="cb-pane-accessories">
           <div class="grid-card">
-            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství (Elektrody, Katétry, Dráty)</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div>
-            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Příslušenství</th><th>Kategorie</th><th>Kompatibilita</th><th>Min. Sklad</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
+            <div class="card-header"><h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství</h3><button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button></div>
+            <div class="card-body"><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Kód</th><th>Název Materiálu</th><th>UDI-DI</th><th>LOT</th><th>REF</th><th>Expirace</th><th style="text-align: right;">Akce</th></tr></thead><tbody id="cb-table-accessories"></tbody></table></div></div>
           </div>
         </div>
       </section>
@@ -301,7 +301,55 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
-  <script src="app.js?v=2.1"></script>
+  <div id="clip-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="clip-modal-title"><i class="fa-solid fa-heart-pulse"></i> Úprava Clip Materiálu</h3>
+        <button class="modal-close" onclick="closeClipModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="clip-id">
+        <div class="form-group margin-bottom-sm"><label>Kód</label><input type="text" id="clip-code" class="modal-input" placeholder="CDS0802-XTW"></div>
+        <div class="form-group margin-bottom-sm"><label>Název Materiálu</label><input type="text" id="clip-name" class="modal-input" placeholder="MitraClip™ G5 Delivery System XTW"></div>
+        <div class="form-group margin-bottom-sm"><label>UDI-DI</label><input type="text" id="clip-udi-di" class="modal-input" placeholder="(01) 05415067050755"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group margin-bottom-sm"><label>LOT</label><input type="text" id="clip-lot" class="modal-input" placeholder="60402A1107"></div>
+          <div class="form-group margin-bottom-sm"><label>REF</label><input type="text" id="clip-ref" class="modal-input" placeholder="CDS0802-XTW"></div>
+        </div>
+        <div class="form-group margin-bottom-sm"><label>Expirace</label><input type="date" id="clip-expiry" class="modal-input"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeClipModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveClipModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="accessory-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="acc-modal-title"><i class="fa-solid fa-plug-circle-bolt"></i> Úprava Příslušenství</h3>
+        <button class="modal-close" onclick="closeAccessoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="acc-id">
+        <div class="form-group margin-bottom-sm"><label>Kód</label><input type="text" id="acc-code" class="modal-input" placeholder="1458Q"></div>
+        <div class="form-group margin-bottom-sm"><label>Název Materiálu</label><input type="text" id="acc-name" class="modal-input" placeholder="Quartet™ 86 cm Elektroda"></div>
+        <div class="form-group margin-bottom-sm"><label>UDI-DI</label><input type="text" id="acc-udi-di" class="modal-input" placeholder="(01) 05415067011224"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group margin-bottom-sm"><label>LOT</label><input type="text" id="acc-lot" class="modal-input" placeholder="70123R2001"></div>
+          <div class="form-group margin-bottom-sm"><label>REF</label><input type="text" id="acc-ref" class="modal-input" placeholder="1458Q-86"></div>
+        </div>
+        <div class="form-group margin-bottom-sm"><label>Expirace</label><input type="date" id="acc-expiry" class="modal-input"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeAccessoryModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveAccessoryModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
 """
@@ -739,16 +787,17 @@ def load_db():
                     { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "tender_start": "2025-06-01", "tender_duration_years": 4, "tender_end": "2029-06-01" },
                     { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" }
                 ],
-                "material": [
-                    { "id": 1, "code": "PM3562", "name": "Quadra Allure MP™ CRT", "category": "CRT-D / ICD", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
-                    { "id": 2, "code": "CDDRA500Q", "name": "Gallant DR CDDRA500Q", "category": "Dvoudutinový ICD (DR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 },
-                    { "id": 3, "code": "CD1359-40QC", "name": "Fortify Assura VR CD1359-40QC", "category": "Jednodutinový ICD (VR)", "supplier": "CARDION s.r.o.", "warranty_months": 72 }
+                "clip": [
+                    { "id": 1, "code": "TSGC0802", "name": "TriClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050892", "lot": "60504R1045", "ref": "TSGC0802", "expiry": "2028-12-31" },
+                    { "id": 2, "code": "CDS0802-XTW", "name": "MitraClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050755", "lot": "60402A1107", "ref": "CDS0802-XTW", "expiry": "2028-09-30" },
+                    { "id": 3, "code": "CDS0802-XT", "name": "MitraClip™ G5 Delivery System XT", "udi_di": "(01) 05415067050861", "lot": "60401A1072", "ref": "CDS0802-XT", "expiry": "2028-10-31" },
+                    { "id": 4, "code": "TCDS0802-XTW", "name": "TriClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050786", "lot": "60319R1082", "ref": "TCDS0802-XTW", "expiry": "2028-06-30" },
+                    { "id": 5, "code": "SGC0802", "name": "MitraClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050823", "lot": "60317A2021", "ref": "SGC0802", "expiry": "2028-11-30" }
                 ],
                 "accessories": [
-                    { "id": 1, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "category": "Elektrody", "compat": "Quadra Allure MP", "stock_min": 10 },
-                    { "id": 2, "code": "405120", "name": "Peel-Away Introducer 405120", "category": "Zaváděcí katétry", "compat": "Univerzální", "stock_min": 25 },
-                    { "id": 3, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "category": "Vodicí katétry", "compat": "Univerzální", "stock_min": 15 },
-                    { "id": 4, "code": "DS2G002", "name": "CPS COURIER™ Guidewire medium 195 cm", "category": "Vodicí dráty", "compat": "Univerzální", "stock_min": 30 }
+                    { "id": 1, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "udi_di": "(01) 05415067011224", "lot": "70123R2001", "ref": "1458Q-86", "expiry": "2029-01-31" },
+                    { "id": 2, "code": "405120", "name": "Peel-Away Introducer 405120", "udi_di": "(01) 05415067022335", "lot": "70211A3012", "ref": "PAI-405120", "expiry": "2028-08-31" },
+                    { "id": 3, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "udi_di": "(01) 05415067033446", "lot": "70315C1045", "ref": "DS2C019-U", "expiry": "2029-03-31" }
                 ]
             },
             "logs": []
@@ -824,9 +873,11 @@ def tool_vlasta_codebooks(cb_type=None, action="get", data=None, item_id=None):
     codebooks = db.get("codebooks", {
         "technicians": [],
         "hospitals": [],
-        "material": [],
+        "clip": [],
         "accessories": []
     })
+    if cb_type == "material" and "clip" in codebooks:
+        cb_type = "clip"
     if action == "get":
         if cb_type and cb_type in codebooks:
             return {cb_type: codebooks[cb_type]}
