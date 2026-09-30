@@ -68,32 +68,36 @@
         "name": "FN Brno Bohunice",
         "city": "Brno",
         "address": "Jihlavská 20, Brno",
-        "preferred_brand": "Quadra Assura MP / Fortify Assura",
-        "tender_status": "Schválený tender 2026"
+        "tender_start": "2026-01-01",
+        "tender_duration_years": 3,
+        "tender_end": "2029-01-01"
       },
       {
         "id": 2,
         "name": "FN USA BRNO",
         "city": "Brno",
         "address": "Pekařská 53, Brno",
-        "preferred_brand": "Gallant HF / DR / VR",
-        "tender_status": "Schválený tender 2026"
+        "tender_start": "2026-03-01",
+        "tender_duration_years": 2,
+        "tender_end": "2028-03-01"
       },
       {
         "id": 3,
         "name": "IKEM Praha",
         "city": "Praha",
         "address": "Vídeňská 1958/9, Praha 4",
-        "preferred_brand": "Gallant / Fortify Assura",
-        "tender_status": "Schválený tender 2026"
+        "tender_start": "2025-06-01",
+        "tender_duration_years": 4,
+        "tender_end": "2029-06-01"
       },
       {
         "id": 4,
         "name": "FNsP Ostrava Poruba",
         "city": "Ostrava",
         "address": "17. listopadu 1790/5, Ostrava",
-        "preferred_brand": "Gallant / Durata 7122",
-        "tender_status": "Schválený tender 2026"
+        "tender_start": "2026-01-01",
+        "tender_duration_years": 3,
+        "tender_end": "2029-01-01"
       }
     ],
     "material": [
