@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLASTA — Systematický Řídicí Portál v1.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div class="brand-text">
+          <h2>VLASTA <span class="badge-vlasta">PRO</span></h2>
+          <span class="subtext">Systematický Portál v1.0</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Hlavní Přehled</span>
+        </button>
+        <button class="nav-item" data-tab="items" onclick="switchTab('items')">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Evidované Položky</span>
+        </button>
+        <button class="nav-item" data-tab="codebooks" onclick="switchTab('codebooks')">
+          <i class="fa-solid fa-book-bookmark"></i>
+          <span>Číselníky</span>
+        </button>
+        <button class="nav-item" data-tab="voice" onclick="switchTab('voice')">
+          <i class="fa-solid fa-microphone-lines"></i>
+          <span>Hlasový Asistent AI</span>
+        </button>
+        <button class="nav-item" data-tab="analytics" onclick="switchTab('analytics')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytika &amp; Statistiky</span>
+        </button>
+      </nav>
+
+
+      <div class="sidebar-footer">
+        <div class="status-box">
+          <span class="status-dot"></span>
+          <span>VLASTA Engine: <strong>Aktivní</strong></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Hlavní Přehled</h1>
+          <p class="page-subtitle" id="page-subtitle">Přehledná správa a řízení projektu VLASTA</p>
+        </div>
+        <div class="header-actions">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="global-search" placeholder="Hledat v projektu Vlasta..." oninput="filterItems()">
+          </div>
+          <button class="btn-primary" onclick="loadVlastaData()">
+            <i class="fa-solid fa-rotate-right"></i> Obnovit Data
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: DASHBOARD -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-cyan"><i class="fa-solid fa-cubes"></i></div>
+            <div class="stat-details">
+              <span class="stat-title">Celkem Položek</span>
+              <h3 id="stat-total-items">0</h3>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-emerald"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="stat-details">
+              <span class="stat-title">Celkové Množství</span>
+              <h3 id="stat-total-qty">0 ks</h3>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-indigo"><i class="fa-solid fa-tags"></i></div>
+            <div class="stat-details">
+              <span class="stat-title">Kategorie</span>
+              <h3 id="stat-categories-count">0</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid margin-top-lg">
+          <div class="grid-card col-span-2">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> Poslední Přidané Záznamy</h3>
+              <button class="btn-secondary btn-sm" onclick="switchTab('items')">Zobrazit Vše</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Kód</th>
+                      <th>Název</th>
+                      <th>Kategorie</th>
+                      <th>Množství</th>
+                      <th>Umovní / Sklad</th>
+                      <th>Stav</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-items-body">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> Rozpad Kategorií</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="categoryChart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ITEMS -->
+      <section class="tab-pane" id="tab-items">
+        <div class="grid-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-boxes-stacked"></i> Evidované Položky v Projektu Vlasta</h3>
+            <button class="btn-primary btn-sm" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Kód</th>
+                    <th>Název Položky</th>
+                    <th>Kategorie</th>
+                    <th>Množství</th>
+                    <th>Umístění</th>
+                    <th>Exspirace / Datum</th>
+                    <th>Stav</th>
+                  </tr>
+                </thead>
+                <tbody id="all-items-body">
+                  <!-- Dynamic -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: CODEBOOKS (ČÍSELNÍKY) -->
+      <section class="tab-pane" id="tab-codebooks">
+        <div class="codebook-header-tabs margin-bottom-md">
+          <button class="cb-tab-btn active" data-cb="technicians" onclick="switchCodebookTab('technicians')">
+            <i class="fa-solid fa-user-gear"></i> Technici
+          </button>
+          <button class="cb-tab-btn" data-cb="hospitals" onclick="switchCodebookTab('hospitals')">
+            <i class="fa-solid fa-hospital"></i> Nemocnice
+          </button>
+          <button class="cb-tab-btn" data-cb="material" onclick="switchCodebookTab('material')">
+            <i class="fa-solid fa-heart-pulse"></i> Materiál
+          </button>
+          <button class="cb-tab-btn" data-cb="accessories" onclick="switchCodebookTab('accessories')">
+            <i class="fa-solid fa-plug-circle-bolt"></i> Příslušenství
+          </button>
+        </div>
+
+        <!-- Subtab Technici -->
+        <div class="cb-pane active" id="cb-pane-technicians">
+          <div class="grid-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-user-gear"></i> Číselník Technických Specialistů</h3>
+              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('technicians')"><i class="fa-solid fa-plus"></i> Přidat Technika</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Jméno a Příjmení</th>
+                      <th>E-mail</th>
+                      <th>Telefon</th>
+                      <th>Stav</th>
+                      <th>Nepřítomnost (Od – Do)</th>
+                      <th style="text-align: right;">Akce</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cb-table-technicians"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab Nemocnice -->
+        <div class="cb-pane" id="cb-pane-hospitals">
+          <div class="grid-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-hospital"></i> Číselník Nemocnic a Kardiocenter</h3>
+              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('hospitals')"><i class="fa-solid fa-plus"></i> Přidat Nemocnici</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Název Nemocnice</th>
+                      <th>Město</th>
+                      <th>Adresa</th>
+                      <th>Preferovaná Značka</th>
+                      <th>Stav Tendru</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cb-table-hospitals"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab Materiál -->
+        <div class="cb-pane" id="cb-pane-material">
+          <div class="grid-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-heart-pulse"></i> Číselník Implantabilního Materiálu (CRT/ICD/Pacemakery)</h3>
+              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('material')"><i class="fa-solid fa-plus"></i> Přidat Materiál</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Kód</th>
+                      <th>Název Materiálu</th>
+                      <th>Kategorie</th>
+                      <th>Dodavatel</th>
+                      <th>Záruka (měs.)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cb-table-material"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab Příslušenství -->
+        <div class="cb-pane" id="cb-pane-accessories">
+          <div class="grid-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-plug-circle-bolt"></i> Číselník Příslušenství (Elektrody, Katétry, Dráty)</h3>
+              <button class="btn-primary btn-sm" onclick="showAddCodebookModal('accessories')"><i class="fa-solid fa-plus"></i> Přidat Příslušenství</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Kód</th>
+                      <th>Název Příslušenství</th>
+                      <th>Kategorie</th>
+                      <th>Kompatibilita</th>
+                      <th>Min. Sklad</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cb-table-accessories"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- TAB 3: VOICE -->
+      <section class="tab-pane" id="tab-voice">
+        <div class="grid-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-microphone text-positive"></i> Hlasový Asistent Vlasta AI</h3>
+          </div>
+          <div class="card-body">
+            <p>Zadejte příkaz hlasem (např. <em>„Přidej novou položku VLS-200, název Testovací Modul, kategorie A, množství 10 kusů.“</em>):</p>
+            
+            <div class="voice-controls margin-top-md">
+              <button class="btn-primary btn-large" id="btn-vlasta-rec" onclick="toggleVlastaVoice()">
+                <i class="fa-solid fa-microphone" id="vlasta-mic-icon"></i>
+                <span id="vlasta-mic-text">Stisknout a Mluvit</span>
+              </button>
+              <span id="vlasta-voice-status" style="font-weight: 600; color: #94a3b8; margin-left: 15px;">Přípraveno</span>
+            </div>
+
+            <div class="form-group margin-top-md">
+              <label for="vlasta-voice-input"><strong>Přepis hlasu / Textový příkaz:</strong></label>
+              <textarea id="vlasta-voice-input" rows="3" class="select-input full-width margin-top-sm" placeholder="Text rozpoznaný hlasem..."></textarea>
+            </div>
+
+            <button class="btn-primary margin-top-sm" onclick="processVlastaVoiceCommand()">
+              <i class="fa-solid fa-bolt"></i> Zpracovat Příkaz Vlasta AI
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ANALYTICS -->
+      <section class="tab-pane" id="tab-analytics">
+        <div class="grid-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Systémová Analytika VLASTA</h3>
+          </div>
+          <div class="card-body">
+            <p>Systém VLASTA běží na dedikovaném REST API a čisté MCP vrstvě. Zde se budou zobrazovat pokročilé agregace a přehledy.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal for Technician Add / Edit -->
+  <div id="technician-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tech-modal-title"><i class="fa-solid fa-user-gear"></i> Úprava Technika</h3>
+        <button class="modal-close" onclick="closeTechnicianModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tech-id">
+        <div class="form-group margin-bottom-sm">
+          <label for="tech-name">Jméno a Příjmení</label>
+          <input type="text" id="tech-name" class="modal-input" placeholder="např. Jan Novák">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="tech-email">E-mail</label>
+          <input type="email" id="tech-email" class="modal-input" placeholder="novak@cardion.cz">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="tech-phone">Telefon</label>
+          <input type="text" id="tech-phone" class="modal-input" placeholder="+420 724 000 000">
+        </div>
+        <div class="form-group margin-bottom-sm">
+          <label for="tech-status">Stav Technika</label>
+          <select id="tech-status" class="modal-input" onchange="toggleAbsenceFields()">
+            <option value="Aktivní">Aktivní</option>
+            <option value="Nepřítomnost">Nepřítomnost</option>
+          </select>
+        </div>
+        <div id="absence-range-container" class="form-group margin-bottom-sm" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label for="tech-absence-from">Nepřítomnost Od</label>
+              <input type="date" id="tech-absence-from" class="modal-input">
+            </div>
+            <div>
+              <label for="tech-absence-to">Nepřítomnost Do</label>
+              <input type="date" id="tech-absence-to" class="modal-input">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeTechnicianModal()">Zrušit</button>
+        <button class="btn-primary" onclick="saveTechnicianModal()"><i class="fa-solid fa-floppy-disk"></i> Uložit Změny</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
