@@ -69,7 +69,7 @@ function loadVlastaCodebooks() {
     vlastaData.codebooks = data || {};
     renderTechniciansTable(data.technicians || []);
     renderHospitalsTable(data.hospitals || []);
-    renderMaterialTable(data.material || []);
+    renderClipTable(data.clip || data.material || []);
     renderAccessoriesTable(data.accessories || []);
   })
   .catch(err => {
@@ -360,34 +360,112 @@ function deleteHospital(hospId) {
   .catch(err => alert('Chyba při mazání: ' + err));
 }
 
-function renderMaterialTable(items) {
-  const tbody = document.getElementById('cb-table-material');
+function renderClipTable(items) {
+  const tbody = document.getElementById('cb-table-clip');
   if (!tbody) return;
-  if (!items.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádný materiál.</td></tr>';
+  if (!items || !items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné clipy.</td></tr>';
     return;
   }
   let html = '';
-  items.forEach(m => {
+  items.forEach(c => {
     html += `
       <tr>
-        <td>#${m.id}</td>
-        <td><strong>${m.code}</strong></td>
-        <td>${m.name}</td>
-        <td><span class="badge-vlasta">${m.category}</span></td>
-        <td>${m.supplier}</td>
-        <td>${m.warranty_months} měs.</td>
+        <td>#${c.id}</td>
+        <td><strong>${c.code || '-'}</strong></td>
+        <td>${c.name || '-'}</td>
+        <td><span class="badge-vlasta">${c.udi_di || '-'}</span></td>
+        <td>${c.lot || '-'}</td>
+        <td>${c.ref || '-'}</td>
+        <td>${c.expiry || '-'}</td>
+        <td style="text-align: right;">
+          <button class="btn-secondary btn-sm" onclick="showEditClipModal(${c.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button>
+          <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteClip(${c.id})"><i class="fa-solid fa-trash"></i> Smazat</button>
+        </td>
       </tr>
     `;
   });
   tbody.innerHTML = html;
 }
 
+function openClipModal(clipId = null) {
+  const modal = document.getElementById('clip-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('clip-modal-title');
+  document.getElementById('clip-id').value = clipId || '';
+
+  if (clipId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-heart-pulse"></i> Úprava Clip Materiálu';
+    const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+    const item = clipList.find(c => c.id === clipId);
+    if (item) {
+      document.getElementById('clip-code').value = item.code || '';
+      document.getElementById('clip-name').value = item.name || '';
+      document.getElementById('clip-udi-di').value = item.udi_di || '';
+      document.getElementById('clip-lot').value = item.lot || '';
+      document.getElementById('clip-ref').value = item.ref || '';
+      document.getElementById('clip-expiry').value = item.expiry || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plus"></i> Přidat Clip Materiál';
+    document.getElementById('clip-code').value = '';
+    document.getElementById('clip-name').value = '';
+    document.getElementById('clip-udi-di').value = '';
+    document.getElementById('clip-lot').value = '';
+    document.getElementById('clip-ref').value = '';
+    document.getElementById('clip-expiry').value = '';
+  }
+  modal.style.display = 'flex';
+}
+
+function showEditClipModal(clipId) { openClipModal(clipId); }
+function closeClipModal() { const modal = document.getElementById('clip-modal'); if (modal) modal.style.display = 'none'; }
+
+function saveClipModal() {
+  const clipId = document.getElementById('clip-id').value;
+  const code = document.getElementById('clip-code').value.trim();
+  const name = document.getElementById('clip-name').value.trim();
+  const udi_di = document.getElementById('clip-udi-di').value.trim();
+  const lot = document.getElementById('clip-lot').value.trim();
+  const ref = document.getElementById('clip-ref').value.trim();
+  const expiry = document.getElementById('clip-expiry').value;
+
+  if (!name) { alert('Zadejte prosím název materiálu.'); return; }
+
+  const itemData = { code, name, udi_di, lot, ref, expiry };
+  const action = clipId ? 'edit' : 'add';
+
+  fetch('/api/vlasta/codebooks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, type: 'clip', id: clipId ? parseInt(clipId) : null, data: itemData })
+  })
+  .then(r => r.json())
+  .then(() => { closeClipModal(); loadVlastaCodebooks(); })
+  .catch(err => alert('Chyba při ukládání: ' + err));
+}
+
+function deleteClip(clipId) {
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+  const item = clipList.find(c => c.id === clipId);
+  const itemName = item ? item.name : `#${clipId}`;
+  if (!confirm(`Opravdu si přejete smazat položku ${itemName}?`)) return;
+
+  fetch(`/api/vlasta/codebooks`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'clip', id: clipId })
+  })
+  .then(r => r.json())
+  .then(() => loadVlastaCodebooks())
+  .catch(err => alert('Chyba při mazání: ' + err));
+}
+
 function renderAccessoriesTable(items) {
   const tbody = document.getElementById('cb-table-accessories');
   if (!tbody) return;
-  if (!items.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádné příslušenství.</td></tr>';
+  if (!items || !items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Žádné příslušenství.</td></tr>';
     return;
   }
   let html = '';
@@ -395,52 +473,100 @@ function renderAccessoriesTable(items) {
     html += `
       <tr>
         <td>#${a.id}</td>
-        <td><strong>${a.code}</strong></td>
-        <td>${a.name}</td>
-        <td><span class="badge-vlasta">${a.category}</span></td>
-        <td>${a.compat}</td>
-        <td>${a.stock_min} ks</td>
+        <td><strong>${a.code || '-'}</strong></td>
+        <td>${a.name || '-'}</td>
+        <td><span class="badge-vlasta">${a.udi_di || '-'}</span></td>
+        <td>${a.lot || '-'}</td>
+        <td>${a.ref || '-'}</td>
+        <td>${a.expiry || '-'}</td>
+        <td style="text-align: right;">
+          <button class="btn-secondary btn-sm" onclick="showEditAccessoryModal(${a.id})"><i class="fa-solid fa-pen-to-square"></i> Upravit</button>
+          <button class="btn-secondary btn-sm" style="color:#ef4444; border-color:#ef4444;" onclick="deleteAccessory(${a.id})"><i class="fa-solid fa-trash"></i> Smazat</button>
+        </td>
       </tr>
     `;
   });
   tbody.innerHTML = html;
 }
 
-function showAddCodebookModal(cbType) {
-  if (cbType === 'technicians') {
-    openTechnicianModal(null);
-    return;
+function openAccessoryModal(accId = null) {
+  const modal = document.getElementById('accessory-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('acc-modal-title');
+  document.getElementById('acc-id').value = accId || '';
+
+  if (accId) {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plug-circle-bolt"></i> Úprava Příslušenství';
+    const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+    const item = accList.find(a => a.id === accId);
+    if (item) {
+      document.getElementById('acc-code').value = item.code || '';
+      document.getElementById('acc-name').value = item.name || '';
+      document.getElementById('acc-udi-di').value = item.udi_di || '';
+      document.getElementById('acc-lot').value = item.lot || '';
+      document.getElementById('acc-ref').value = item.ref || '';
+      document.getElementById('acc-expiry').value = item.expiry || '';
+    }
+  } else {
+    modalTitle.innerHTML = '<i class="fa-solid fa-plus"></i> Přidat Příslušenství';
+    document.getElementById('acc-code').value = '';
+    document.getElementById('acc-name').value = '';
+    document.getElementById('acc-udi-di').value = '';
+    document.getElementById('acc-lot').value = '';
+    document.getElementById('acc-ref').value = '';
+    document.getElementById('acc-expiry').value = '';
   }
-  if (cbType === 'hospitals') {
-    openHospitalModal(null);
-    return;
-  }
-  const labels = {
-    material: 'Materiál (Kód, Název, Kategorie, Dodavatel)',
-    accessories: 'Příslušenství (Kód, Název, Kategorie, Kompatibilita)'
-  };
-  const val = prompt(`Přidat záznam do číselníku pro ${labels[cbType] || cbType}:\nZadejte hodnoty oddělené čárkou.`);
-  if (!val) return;
-  
-  const parts = val.split(',').map(p => p.trim());
-  let itemData = {};
-  if (cbType === 'hospitals') {
-    itemData = { name: parts[0] || 'Nová Nemocnice', city: parts[1] || 'Brno', address: parts[2] || 'Hlavní 1', preferred_brand: parts[3] || 'Gallant', tender_status: 'Aktivní' };
-  } else if (cbType === 'material') {
-    itemData = { code: parts[0] || 'MAT-001', name: parts[1] || 'Nový Materiál', category: parts[2] || 'ICD', supplier: parts[3] || 'CARDION', warranty_months: 72 };
-  } else if (cbType === 'accessories') {
-    itemData = { code: parts[0] || 'ACC-001', name: parts[1] || 'Nové Příslušenství', category: parts[2] || 'Elektrody', compat: parts[3] || 'Univerzální', stock_min: 10 };
-  }
+  modal.style.display = 'flex';
+}
+
+function showEditAccessoryModal(accId) { openAccessoryModal(accId); }
+function closeAccessoryModal() { const modal = document.getElementById('accessory-modal'); if (modal) modal.style.display = 'none'; }
+
+function saveAccessoryModal() {
+  const accId = document.getElementById('acc-id').value;
+  const code = document.getElementById('acc-code').value.trim();
+  const name = document.getElementById('acc-name').value.trim();
+  const udi_di = document.getElementById('acc-udi-di').value.trim();
+  const lot = document.getElementById('acc-lot').value.trim();
+  const ref = document.getElementById('acc-ref').value.trim();
+  const expiry = document.getElementById('acc-expiry').value;
+
+  if (!name) { alert('Zadejte prosím název příslušenství.'); return; }
+
+  const itemData = { code, name, udi_di, lot, ref, expiry };
+  const action = accId ? 'edit' : 'add';
 
   fetch('/api/vlasta/codebooks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'add', type: cbType, data: itemData })
+    body: JSON.stringify({ action, type: 'accessories', id: accId ? parseInt(accId) : null, data: itemData })
   })
   .then(r => r.json())
-  .then(res => {
-    loadVlastaCodebooks();
-  });
+  .then(() => { closeAccessoryModal(); loadVlastaCodebooks(); })
+  .catch(err => alert('Chyba při ukládání: ' + err));
+}
+
+function deleteAccessory(accId) {
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+  const item = accList.find(a => a.id === accId);
+  const itemName = item ? item.name : `#${accId}`;
+  if (!confirm(`Opravdu si přejete smazat položku ${itemName}?`)) return;
+
+  fetch(`/api/vlasta/codebooks`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'accessories', id: accId })
+  })
+  .then(r => r.json())
+  .then(() => loadVlastaCodebooks())
+  .catch(err => alert('Chyba při mazání: ' + err));
+}
+
+function showAddCodebookModal(cbType) {
+  if (cbType === 'technicians') { openTechnicianModal(null); return; }
+  if (cbType === 'hospitals') { openHospitalModal(null); return; }
+  if (cbType === 'clip') { openClipModal(null); return; }
+  if (cbType === 'accessories') { openAccessoryModal(null); return; }
 }
 
 function renderDashboardStats() {
