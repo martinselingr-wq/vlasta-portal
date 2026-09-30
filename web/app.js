@@ -679,6 +679,23 @@ function renderRecentTable(recentItems) {
   tbody.innerHTML = html;
 }
 
+let filterExpiry90Only = false;
+
+function toggleExpiry90Filter() {
+  filterExpiry90Only = !filterExpiry90Only;
+  const btn = document.getElementById('btn-filter-expiry90');
+  if (btn) {
+    if (filterExpiry90Only) {
+      btn.classList.add('active-filter');
+      btn.innerHTML = `<i class="fa-solid fa-filter-circle-xmark"></i> Zobrazit Vše`;
+    } else {
+      btn.classList.remove('active-filter');
+      btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Expirace 90 dní`;
+    }
+  }
+  renderItemsTable();
+}
+
 function renderItemsTable() {
   const tbody = document.getElementById('all-items-body');
   if (!tbody) return;
@@ -726,9 +743,21 @@ function renderItemsTable() {
     }
   });
 
+  let filteredGroups = Object.values(groups);
+  if (filterExpiry90Only) {
+    filteredGroups = filteredGroups.filter(g => g.expiring90Qty > 0);
+  }
+
+  if (filteredGroups.length === 0) {
+    tbody.innerHTML = filterExpiry90Only 
+      ? '<tr><td colspan="8" style="text-align:center; padding: 25px; color: #f87171; font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Žádné položky nemají expiraci do 90 dní.</td></tr>'
+      : '<tr><td colspan="8" style="text-align:center;">Žádné evidované položky k zobrazení.</td></tr>';
+    return;
+  }
+
   let html = '';
   let rowIdx = 1;
-  Object.values(groups).forEach(g => {
+  filteredGroups.forEach(g => {
     // Breakdown of locations
     const locArr = Object.entries(g.locations).map(([loc, count]) => `${loc} (${count} ks)`);
     const locStr = locArr.join(', ');
