@@ -1,0 +1,11 @@
+{
+  "system_name": "VLASTA",
+  "version": "1.0.0",
+  "web_port": 3001,
+  "mcp_port": 8091,
+  "mcp_url": "http://127.0.0.1:8091/mcp",
+  "admin_email": "martin.selingr@gmail.com",
+  "notification_email": "ai.selingr@gmail.com",
+  "smtp_server": "smtp.gmail.com",
+  "smtp_port": 587
+}
