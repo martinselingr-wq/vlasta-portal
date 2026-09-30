@@ -820,11 +820,9 @@ function showAddItemModal() { openClipModal(null); }
 function getAllRawItems() {
   const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
   const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
-  const standaloneItems = vlastaData.items || [];
   return [
     ...clipList.map(i => ({ ...i, category: 'Clip', quantity: parseInt(i.quantity) || 1 })),
-    ...accList.map(i => ({ ...i, category: 'Příslušenství', quantity: parseInt(i.quantity) || 1 })),
-    ...standaloneItems.map(i => ({ ...i, quantity: parseInt(i.quantity) || 1 }))
+    ...accList.map(i => ({ ...i, category: 'Příslušenství', quantity: parseInt(i.quantity) || 1 }))
   ];
 }
 
