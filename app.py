@@ -1406,6 +1406,14 @@ def add_item():
     )
     return jsonify(res)
 
+@app.route('/api/vlasta/reset-db', methods=['GET', 'POST'])
+def reset_db_endpoint():
+    if os.path.exists(DB_FILE):
+        try: os.remove(DB_FILE)
+        except Exception: pass
+    db = load_db()
+    return jsonify({"ok": True, "message": "Databáze resetována", "db": db})
+
 @app.route('/api/vlasta/implantations', methods=['GET', 'POST', 'DELETE'])
 def manage_implantations():
     db = load_db()
