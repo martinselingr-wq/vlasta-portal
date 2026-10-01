@@ -1,560 +1,650 @@
 {
-  "items": [],
+  "items": [
+    {
+      "id": 1,
+      "kind": "clip",
+      "family": "Dvojcíp",
+      "code": "SVOR-802-XT",
+      "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)",
+      "udi_di": "(01)00001234569001",
+      "lot": "LOT6305E62026",
+      "ref": "REF-X-19494",
+      "expiry": "2026-11-18",
+      "allocations": [
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 2 },
+        { "location": "Jan Kovář", "qty": 2 }
+      ],
+      "minStock": 6,
+      "quantity": 4,
+      "location": "FN Kamenice – Nový Lískovec"
+    },
+    {
+      "id": 2,
+      "kind": "clip",
+      "family": "Dvojcíp",
+      "code": "SVOR-802-XTW",
+      "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká a Dlouhá)",
+      "udi_di": "(01)00001234570112",
+      "lot": "LOT9779D52026",
+      "ref": "REF-X-76510",
+      "expiry": "2027-06-30",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 4 },
+        { "location": "Petra Šťastná", "qty": 1 },
+        { "location": "Fakultní kardio-pavilon Uhlohrad", "qty": 2 }
+      ],
+      "minStock": 4,
+      "quantity": 7,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 3,
+      "kind": "clip",
+      "family": "Dvojcíp",
+      "code": "SVOR-802-NT",
+      "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)",
+      "udi_di": "(01)00001234571223",
+      "lot": "LOT4517B12026",
+      "ref": "REF-K-64810",
+      "expiry": "2026-12-09",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 2 },
+        { "location": "Městská nemocnice Hůrka pod Ještědem", "qty": 1 }
+      ],
+      "minStock": 5,
+      "quantity": 3,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 4,
+      "kind": "clip",
+      "family": "Dvojcíp",
+      "code": "SVOR-802-NTW",
+      "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)",
+      "udi_di": "(01)00001234572334",
+      "lot": "LOT2144H12026",
+      "ref": "REF-K-17747",
+      "expiry": "2027-09-14",
+      "allocations": [
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 3 },
+        { "location": "Marek Dvořák", "qty": 1 }
+      ],
+      "minStock": 3,
+      "quantity": 4,
+      "location": "FN Kamenice – Nový Lískovec"
+    },
+    {
+      "id": 5,
+      "kind": "clip",
+      "family": "Trojcíp",
+      "code": "TRI-702-XT",
+      "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT)",
+      "udi_di": "(01)00001234573445",
+      "lot": "LOT3028H92026",
+      "ref": "REF-X-85642",
+      "expiry": "2027-03-22",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 3 },
+        { "location": "Jindřich „Jindra“ Blažek", "qty": 1 }
+      ],
+      "minStock": 3,
+      "quantity": 4,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 6,
+      "kind": "clip",
+      "family": "Trojcíp",
+      "code": "TRI-702-XTW",
+      "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)",
+      "udi_di": "(01)00001234574556",
+      "lot": "LOT7499B32026",
+      "ref": "REF-X-82963",
+      "expiry": "2026-12-20",
+      "allocations": [
+        { "location": "Fakultní kardio-pavilon Uhlohrad", "qty": 2 },
+        { "location": "Marek Dvořák", "qty": 1 }
+      ],
+      "minStock": 4,
+      "quantity": 3,
+      "location": "Fakultní kardio-pavilon Uhlohrad"
+    },
+    {
+      "id": 7,
+      "kind": "clip",
+      "family": "Trojcíp",
+      "code": "TRI-702-NTW",
+      "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč NTW)",
+      "udi_di": "(01)00001234575667",
+      "lot": "LOT3181K62026",
+      "ref": "REF-M-80868",
+      "expiry": "2027-08-05",
+      "allocations": [
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 2 },
+        { "location": "Městská nemocnice Hůrka pod Ještědem", "qty": 2 }
+      ],
+      "minStock": 3,
+      "quantity": 4,
+      "location": "FN Kamenice – Nový Lískovec"
+    },
+    {
+      "id": 8,
+      "kind": "accessory",
+      "family": "Dvojcíp",
+      "code": "KAT-RID-802",
+      "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)",
+      "udi_di": "(01)00001234576778",
+      "lot": "LOT2929W42026",
+      "ref": "REF-M-23507",
+      "expiry": "2027-01-31",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 4 },
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 2 },
+        { "location": "Jan Kovář", "qty": 1 }
+      ],
+      "minStock": 5,
+      "quantity": 7,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 9,
+      "kind": "accessory",
+      "family": "Trojcíp",
+      "code": "KAT-NAV-802",
+      "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)",
+      "udi_di": "(01)00001234577889",
+      "lot": "LOT4078N12026",
+      "ref": "REF-X-83972",
+      "expiry": "2026-11-02",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 2 },
+        { "location": "Fakultní kardio-pavilon Uhlohrad", "qty": 1 },
+        { "location": "Jindřich „Jindra“ Blažek", "qty": 1 }
+      ],
+      "minStock": 6,
+      "quantity": 4,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 10,
+      "kind": "accessory",
+      "family": "Společné",
+      "code": "DIL-24F-120",
+      "name": "Rozšiřovací dilatátor 24F „Prostor“",
+      "udi_di": "(01)00001234579000",
+      "lot": "LOT1976X32026",
+      "ref": "REF-K-99181",
+      "expiry": "2028-02-28",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 3 },
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 2 },
+        { "location": "Fakultní kardio-pavilon Uhlohrad", "qty": 2 }
+      ],
+      "minStock": 6,
+      "quantity": 7,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    },
+    {
+      "id": 11,
+      "kind": "accessory",
+      "family": "Společné",
+      "code": "TSG-TRH-120",
+      "name": "Trhací šlupkový zavaděč „Sloupni a jdi“ 405120",
+      "udi_di": "(01)00001234580111",
+      "lot": "LOT9711R52026",
+      "ref": "REF-K-86750",
+      "expiry": "2026-12-01",
+      "allocations": [
+        { "location": "Městská nemocnice Hůrka pod Ještědem", "qty": 3 },
+        { "location": "Jan Kovář", "qty": 2 }
+      ],
+      "minStock": 4,
+      "quantity": 5,
+      "location": "Městská nemocnice Hůrka pod Ještědem"
+    },
+    {
+      "id": 12,
+      "kind": "accessory",
+      "family": "Společné",
+      "code": "STB-PODL-01",
+      "name": "Stabilizační podložka „Klidná ruka“",
+      "udi_di": "(01)00001234581222",
+      "lot": "LOT8424N42026",
+      "ref": "REF-M-33562",
+      "expiry": "2029-05-15",
+      "allocations": [
+        { "location": "Kardiocentrum Bradavice n. Nisou", "qty": 2 },
+        { "location": "FN Kamenice – Nový Lískovec", "qty": 2 }
+      ],
+      "minStock": 2,
+      "quantity": 4,
+      "location": "Kardiocentrum Bradavice n. Nisou"
+    }
+  ],
   "codebooks": {
     "technicians": [
       {
         "id": 1,
-        "name": "Marek Dvořák",
-        "email": "marek.dvorak@vlasta-project.cz",
-        "phone": "+420 724 111 222",
-        "status": "Aktivní",
-        "absence_from": "",
-        "absence_to": ""
+        "name": "Jan Kovář",
+        "region": "Region Kamenice",
+        "phone": "+420 700 000 001",
+        "email": "jan.kovar@vlasta-project.cz",
+        "status": "Aktivní"
       },
       {
         "id": 2,
-        "name": "Tomáš Veselý",
-        "email": "tomas.vesely@vlasta-project.cz",
-        "phone": "+420 724 528 085",
-        "status": "Nepřítomnost",
-        "absence_from": "2026-10-01",
-        "absence_to": "2026-10-15"
+        "name": "Petra Šťastná",
+        "region": "Region Bradavice",
+        "phone": "+420 700 000 002",
+        "email": "petra.stastna@vlasta-project.cz",
+        "status": "Aktivní"
       },
       {
         "id": 3,
-        "name": "Jindřich \"Jindra\" Blažek",
-        "email": "jindrich.blazek@vlasta-project.cz",
-        "phone": "+420 724 333 444",
-        "status": "Aktivní",
-        "absence_from": "",
-        "absence_to": ""
+        "name": "Marek Dvořák",
+        "region": "Region Uhlohrad",
+        "phone": "+420 700 000 003",
+        "email": "marek.dvorak@vlasta-project.cz",
+        "status": "Aktivní"
       },
       {
         "id": 4,
-        "name": "Jan Kovář",
-        "email": "jan.kovar@vlasta-project.cz",
-        "phone": "+420 724 555 666",
-        "status": "Aktivní",
-        "absence_from": "",
-        "absence_to": ""
+        "name": "Jindřich „Jindra“ Blažek",
+        "region": "Region Hůrka",
+        "phone": "+420 700 000 004",
+        "email": "jindrich.blazek@vlasta-project.cz",
+        "status": "Aktivní"
       }
     ],
     "hospitals": [
       {
         "id": 1,
-        "name": "FN Kamenice - Nový Lískovec",
+        "name": "Kardiocentrum Bradavice n. Nisou",
+        "city": "Bradavice n. Nisou",
+        "department": "Klinika kardiologie",
+        "address": "Kardiologická 1, Bradavice n. Nisou",
+        "tender_start": "2026-01-01",
+        "tender_duration_years": 3,
+        "tender_end": "2029-01-01"
+      },
+      {
+        "id": 2,
+        "name": "FN Kamenice – Nový Lískovec",
         "city": "Kamenice",
+        "department": "Interní kardiologická klinika",
         "address": "Kamenická 20, Kamenice",
         "tender_start": "2026-01-01",
         "tender_duration_years": 3,
         "tender_end": "2029-01-01"
       },
       {
-        "id": 2,
-        "name": "Městská nemocnice Hůrka pod Ještědem",
-        "city": "Hůrka pod Ještědem",
-        "address": "Podještědská 53, Hůrka pod Ještědem",
-        "tender_start": "2026-03-01",
-        "tender_duration_years": 2,
-        "tender_end": "2028-03-01"
-      },
-      {
         "id": 3,
-        "name": "Kardioinstitut Rybníček",
-        "city": "Rybníček",
-        "address": "Rybniční 1958/9, Rybníček",
-        "tender_start": "2025-06-01",
-        "tender_duration_years": 4,
-        "tender_end": "2029-06-01"
-      },
-      {
-        "id": 4,
         "name": "Fakultní kardio-pavilon Uhlohrad",
         "city": "Uhlohrad",
+        "department": "Kardiovaskulární oddělení",
         "address": "Uhelná 1790/5, Uhlohrad",
         "tender_start": "2026-01-01",
         "tender_duration_years": 3,
         "tender_end": "2029-01-01"
+      },
+      {
+        "id": 4,
+        "name": "Městská nemocnice Hůrka pod Ještědem",
+        "city": "Hůrka pod Ještědem",
+        "department": "I. interní kardioangiologická klinika",
+        "address": "Podještědská 53, Hůrka pod Ještědem",
+        "tender_start": "2026-03-01",
+        "tender_duration_years": 2,
+        "tender_end": "2028-03-01"
       }
     ],
     "clip": [
       {
         "id": 1,
-        "code": "SVOR-802-XTW",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)",
-        "udi_di": "(01) 00001234567890",
-        "lot": "LOT9941X2026",
-        "ref": "REF-M-802-XTW",
-        "expiry": "2028-09-30",
-        "location": "Fakultní kardio-pavilon Uhlohrad",
-        "quantity": 2
+        "kind": "clip",
+        "family": "Dvojcíp",
+        "code": "SVOR-802-XT",
+        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)",
+        "udi_di": "(01)00001234569001",
+        "lot": "LOT6305E62026",
+        "ref": "REF-X-19494",
+        "expiry": "2026-11-18",
+        "location": "FN Kamenice – Nový Lískovec",
+        "quantity": 4,
+        "minStock": 6
       },
       {
         "id": 2,
-        "code": "SVOR-802-XT",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)",
-        "udi_di": "(01) 00001234567891",
-        "lot": "LOT7723B2026",
-        "ref": "REF-M-802-XT",
-        "expiry": "2026-10-15",
-        "location": "FN Kamenice - Nový Lískovec",
-        "quantity": 2
+        "kind": "clip",
+        "family": "Dvojcíp",
+        "code": "SVOR-802-XTW",
+        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká a Dlouhá)",
+        "udi_di": "(01)00001234570112",
+        "lot": "LOT9779D52026",
+        "ref": "REF-X-76510",
+        "expiry": "2027-06-30",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 7,
+        "minStock": 4
       },
       {
         "id": 3,
-        "code": "T-SVOR-802-XTW",
-        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)",
-        "udi_di": "(01) 00001234567892",
-        "lot": "LOT5512C2026",
-        "ref": "REF-T-802-XTW",
-        "expiry": "2028-06-30",
-        "location": "Tomáš Veselý",
-        "quantity": 1
+        "kind": "clip",
+        "family": "Dvojcíp",
+        "code": "SVOR-802-NT",
+        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)",
+        "udi_di": "(01)00001234571223",
+        "lot": "LOT4517B12026",
+        "ref": "REF-K-64810",
+        "expiry": "2026-12-09",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 3,
+        "minStock": 5
       },
       {
         "id": 4,
-        "code": "SVOR-802-XTW",
+        "kind": "clip",
+        "family": "Dvojcíp",
+        "code": "SVOR-802-NTW",
         "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)",
-        "udi_di": "(01) 00001234567890",
-        "lot": "LOT9942X2026",
-        "ref": "REF-M-802-XTW",
-        "expiry": "2028-09-30",
-        "location": "Kardioinstitut Rybníček",
-        "quantity": 1
+        "udi_di": "(01)00001234572334",
+        "lot": "LOT2144H12026",
+        "ref": "REF-K-17747",
+        "expiry": "2027-09-14",
+        "location": "FN Kamenice – Nový Lískovec",
+        "quantity": 4,
+        "minStock": 3
       },
       {
         "id": 5,
-        "code": "SVOR-802-NTW",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká Standard)",
-        "udi_di": "(01) 00001234567893",
-        "lot": "LOT8834D2026",
-        "ref": "REF-M-802-NTW",
-        "expiry": "2026-11-20",
-        "location": "Jindřich \"Jindra\" Blažek",
-        "quantity": 1
+        "kind": "clip",
+        "family": "Trojcíp",
+        "code": "TRI-702-XT",
+        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT)",
+        "udi_di": "(01)00001234573445",
+        "lot": "LOT3028H92026",
+        "ref": "REF-X-85642",
+        "expiry": "2027-03-22",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 4,
+        "minStock": 3
       },
       {
         "id": 6,
-        "code": "SVOR-802-NT",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)",
-        "udi_di": "(01) 00001234567894",
-        "lot": "LOT3321E2026",
-        "ref": "REF-M-802-NT",
-        "expiry": "2026-11-05",
-        "location": "Městská nemocnice Hůrka pod Ještědem",
-        "quantity": 2
+        "kind": "clip",
+        "family": "Trojcíp",
+        "code": "TRI-702-XTW",
+        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)",
+        "udi_di": "(01)00001234574556",
+        "lot": "LOT7499B32026",
+        "ref": "REF-X-82963",
+        "expiry": "2026-12-20",
+        "location": "Fakultní kardio-pavilon Uhlohrad",
+        "quantity": 3,
+        "minStock": 4
       },
       {
         "id": 7,
-        "code": "T-SVOR-802-XT",
-        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT)",
-        "udi_di": "(01) 00001234567895",
-        "lot": "LOT1145F2026",
-        "ref": "REF-T-802-XT",
-        "expiry": "2027-04-30",
-        "location": "Fakultní kardio-pavilon Uhlohrad",
-        "quantity": 3
-      },
-      {
-        "id": 8,
-        "code": "SVOR-802-XTW",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)",
-        "udi_di": "(01) 00001234567890",
-        "lot": "LOT9943X2026",
-        "ref": "REF-M-802-XTW",
-        "expiry": "2026-10-30",
-        "location": "Marek Dvořák",
-        "quantity": 1
-      },
-      {
-        "id": 9,
-        "code": "SVOR-802-XT",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)",
-        "udi_di": "(01) 00001234567891",
-        "lot": "LOT7724B2026",
-        "ref": "REF-M-802-XT",
-        "expiry": "2028-01-15",
-        "location": "Jan Kovář",
-        "quantity": 2
-      },
-      {
-        "id": 10,
-        "code": "T-SVOR-802-XTW",
-        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)",
-        "udi_di": "(01) 00001234567892",
-        "lot": "LOT5513C2026",
-        "ref": "REF-T-802-XTW",
-        "expiry": "2026-12-10",
-        "location": "Kardioinstitut Rybníček",
-        "quantity": 2
-      },
-      {
-        "id": 11,
-        "code": "SVOR-802-NTW",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká Standard)",
-        "udi_di": "(01) 00001234567893",
-        "lot": "LOT8835D2026",
-        "ref": "REF-M-802-NTW",
-        "expiry": "2027-08-20",
-        "location": "FN Kamenice - Nový Lískovec",
-        "quantity": 3
-      },
-      {
-        "id": 12,
-        "code": "SVOR-802-XTW",
-        "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)",
-        "udi_di": "(01) 00001234567890",
-        "lot": "LOT9944X2026",
-        "ref": "REF-M-802-XTW",
-        "expiry": "2028-11-15",
-        "location": "Centrální sklad VLASTA",
-        "quantity": 5
+        "kind": "clip",
+        "family": "Trojcíp",
+        "code": "TRI-702-NTW",
+        "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč NTW)",
+        "udi_di": "(01)00001234575667",
+        "lot": "LOT3181K62026",
+        "ref": "REF-M-80868",
+        "expiry": "2027-08-05",
+        "location": "FN Kamenice – Nový Lískovec",
+        "quantity": 4,
+        "minStock": 3
       }
     ],
     "accessories": [
       {
-        "id": 1,
-        "code": "KAT-NAV-802",
-        "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)",
-        "udi_di": "(01) 00001234567896",
-        "lot": "LOT4490G2026",
-        "ref": "REF-NAV-802",
-        "expiry": "2028-12-31",
-        "location": "Fakultní kardio-pavilon Uhlohrad",
-        "quantity": 3
-      },
-      {
-        "id": 2,
-        "code": "KAT-MIT-802",
-        "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)",
-        "udi_di": "(01) 00001234567897",
-        "lot": "LOT6681H2026",
-        "ref": "REF-MIT-802",
-        "expiry": "2026-10-25",
-        "location": "Fakultní kardio-pavilon Uhlohrad",
-        "quantity": 1
-      },
-      {
-        "id": 3,
-        "code": "STRUNA-86Q",
-        "name": "Čtyřkvartetová napájecí struna 86 cm",
-        "udi_di": "(01) 00001234567898",
-        "lot": "LOT2273J2026",
-        "ref": "REF-ELE-86Q",
-        "expiry": "2029-01-31",
-        "location": "Marek Dvořák",
-        "quantity": 5
-      },
-      {
-        "id": 4,
-        "code": "TSG-TRH-120",
-        "name": "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120",
-        "udi_di": "(01) 00001234567899",
-        "lot": "LOT9914K2026",
-        "ref": "REF-ZAV-120",
-        "expiry": "2028-08-31",
-        "location": "Městská nemocnice Hůrka pod Ještědem",
-        "quantity": 4
-      },
-      {
-        "id": 5,
-        "code": "KAT-NAV-802",
-        "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)",
-        "udi_di": "(01) 00001234567896",
-        "lot": "LOT4491G2026",
-        "ref": "REF-NAV-802",
-        "expiry": "2028-12-31",
-        "location": "Jindřich \"Jindra\" Blažek",
-        "quantity": 1
-      },
-      {
-        "id": 6,
-        "code": "TUBUS-2C019",
-        "name": "Univerzální vodicí tubus 'Přímo do cíle' DS2C019",
-        "udi_di": "(01) 00001234567900",
-        "lot": "LOT8825L2026",
-        "ref": "REF-TUB-019",
-        "expiry": "2029-03-31",
-        "location": "Kardioinstitut Rybníček",
-        "quantity": 2
-      },
-      {
-        "id": 7,
-        "code": "KAT-MIT-802",
-        "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)",
-        "udi_di": "(01) 00001234567897",
-        "lot": "LOT6682H2026",
-        "ref": "REF-MIT-802",
-        "expiry": "2026-12-05",
-        "location": "Kardioinstitut Rybníček",
-        "quantity": 2
-      },
-      {
         "id": 8,
-        "code": "KAT-MIT-802",
+        "kind": "accessory",
+        "family": "Dvojcíp",
+        "code": "KAT-RID-802",
         "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)",
-        "udi_di": "(01) 00001234567897",
-        "lot": "LOT6683H2026",
-        "ref": "REF-MIT-802",
-        "expiry": "2026-11-15",
-        "location": "FN Kamenice - Nový Lískovec",
-        "quantity": 2
+        "udi_di": "(01)00001234576778",
+        "lot": "LOT2929W42026",
+        "ref": "REF-M-23507",
+        "expiry": "2027-01-31",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 7,
+        "minStock": 5
       },
       {
         "id": 9,
+        "kind": "accessory",
+        "family": "Trojcíp",
         "code": "KAT-NAV-802",
         "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)",
-        "udi_di": "(01) 00001234567896",
-        "lot": "LOT4492G2026",
-        "ref": "REF-NAV-802",
-        "expiry": "2027-03-31",
-        "location": "Městská nemocnice Hůrka pod Ještědem",
-        "quantity": 2
+        "udi_di": "(01)00001234577889",
+        "lot": "LOT4078N12026",
+        "ref": "REF-X-83972",
+        "expiry": "2026-11-02",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 4,
+        "minStock": 6
       },
       {
         "id": 10,
-        "code": "TSG-TRH-120",
-        "name": "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120",
-        "udi_di": "(01) 00001234567899",
-        "lot": "LOT9915K2026",
-        "ref": "REF-ZAV-120",
-        "expiry": "2026-10-18",
-        "location": "Jan Kovář",
-        "quantity": 3
+        "kind": "accessory",
+        "family": "Společné",
+        "code": "DIL-24F-120",
+        "name": "Rozšiřovací dilatátor 24F „Prostor“",
+        "udi_di": "(01)00001234579000",
+        "lot": "LOT1976X32026",
+        "ref": "REF-K-99181",
+        "expiry": "2028-02-28",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 7,
+        "minStock": 6
       },
       {
         "id": 11,
-        "code": "STRUNA-86Q",
-        "name": "Čtyřkvartetová napájecí struna 86 cm",
-        "udi_di": "(01) 00001234567898",
-        "lot": "LOT2274J2026",
-        "ref": "REF-ELE-86Q",
-        "expiry": "2028-05-15",
-        "location": "Kardioinstitut Rybníček",
-        "quantity": 4
+        "kind": "accessory",
+        "family": "Společné",
+        "code": "TSG-TRH-120",
+        "name": "Trhací šlupkový zavaděč „Sloupni a jdi“ 405120",
+        "udi_di": "(01)00001234580111",
+        "lot": "LOT9711R52026",
+        "ref": "REF-K-86750",
+        "expiry": "2026-12-01",
+        "location": "Městská nemocnice Hůrka pod Ještědem",
+        "quantity": 5,
+        "minStock": 4
       },
       {
         "id": 12,
-        "code": "TUBUS-2C019",
-        "name": "Univerzální vodicí tubus 'Přímo do cíle' DS2C019",
-        "udi_di": "(01) 00001234567900",
-        "lot": "LOT8826L2026",
-        "ref": "REF-TUB-019",
-        "expiry": "2027-09-30",
-        "location": "Fakultní kardio-pavilon Uhlohrad",
-        "quantity": 2
-      },
-      {
-        "id": 13,
-        "code": "KAT-MIT-802",
-        "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)",
-        "udi_di": "(01) 00001234567897",
-        "lot": "LOT6684H2026",
-        "ref": "REF-MIT-802",
-        "expiry": "2028-04-10",
-        "location": "Tomáš Veselý",
-        "quantity": 2
-      },
-      {
-        "id": 14,
-        "code": "LAPAK-V100",
-        "name": "Chyták do véčka (Lapák V-100)",
-        "udi_di": "(01) 00001234567901",
-        "lot": "LOT5536M2026",
-        "ref": "REF-LAP-100",
-        "expiry": "2026-11-30",
-        "location": "FN Kamenice - Nový Lískovec",
-        "quantity": 3
-      },
-      {
-        "id": 15,
-        "code": "KAT-NAV-802",
-        "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)",
-        "udi_di": "(01) 00001234567896",
-        "lot": "LOT4493G2026",
-        "ref": "REF-NAV-802",
-        "expiry": "2028-10-15",
-        "location": "Centrální sklad VLASTA",
-        "quantity": 4
+        "kind": "accessory",
+        "family": "Společné",
+        "code": "STB-PODL-01",
+        "name": "Stabilizační podložka „Klidná ruka“",
+        "udi_di": "(01)00001234581222",
+        "lot": "LOT8424N42026",
+        "ref": "REF-M-33562",
+        "expiry": "2029-05-15",
+        "location": "Kardiocentrum Bradavice n. Nisou",
+        "quantity": 4,
+        "minStock": 2
       }
     ]
   },
   "implantations": [
     {
-      "id": "IMP-2026-001",
-      "date": "2026-09-28",
-      "hospital": "Fakultní kardio-pavilon Uhlohrad",
+      "id": "IMP-2026-009",
+      "date": "2026-09-16",
       "time_from": "09:30",
       "time_to": "11:45",
-      "gender": "Muž",
-      "birth_date": "1958-04-12",
-      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká) (SVOR-802-XTW)",
-      "triclip_name": "-",
-      "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"
-      ],
-      "indication": "Těžká sekundární mitrální regurgitace st. IV",
-      "location": "Segment A2/P2"
-    },
-    {
-      "id": "IMP-2026-002",
-      "date": "2026-09-29",
-      "hospital": "Kardioinstitut Rybníček",
-      "time_from": "13:00",
-      "time_to": "15:15",
-      "gender": "Žena",
-      "birth_date": "1964-11-03",
+      "hospital": "Městská nemocnice Hůrka pod Ještědem",
+      "hospitalId": 4,
+      "technicianId": 1,
       "mitraclip_name": "-",
-      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW) (T-SVOR-802-XTW)",
+      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč NTW) (TRI-702-NTW)",
       "accessories": [
         "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)",
-        "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120 (TSG-TRH-120)"
+        "Trhací šlupkový zavaděč „Sloupni a jdi“ 405120 (TSG-TRH-120)"
       ],
+      "gender": "Žena",
+      "birth_date": "1947-05-12",
       "indication": "Těžká trikuspidální regurgitace",
       "location": "Anteroseptální komisura"
     },
     {
-      "id": "IMP-2026-003",
-      "date": "2026-01-14",
-      "hospital": "FN Kamenice - Nový Lískovec",
-      "time_from": "08:30",
-      "time_to": "11:15",
+      "id": "IMP-2026-008",
+      "date": "2026-08-27",
+      "time_from": "14:00",
+      "time_to": "15:30",
+      "hospital": "Kardiocentrum Bradavice n. Nisou",
+      "hospitalId": 1,
+      "technicianId": 2,
+      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká) (SVOR-802-NTW)",
+      "triclip_name": "-",
+      "accessories": [
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Stabilizační podložka „Klidná ruka“ (STB-PODL-01)"
+      ],
       "gender": "Muž",
-      "birth_date": "1952-07-21",
-      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá) (SVOR-802-XT)",
-      "triclip_name": "-",
-      "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"
-      ],
-      "indication": "Těžká primární degenerativní mitrální regurgitace st. IV",
-      "location": "Segment A2/P2"
-    },
-    {
-      "id": "IMP-2026-004",
-      "date": "2026-02-25",
-      "hospital": "Kardioinstitut Rybníček",
-      "time_from": "10:00",
-      "time_to": "12:30",
-      "gender": "Žena",
-      "birth_date": "1947-03-15",
-      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká Standard) (SVOR-802-NTW)",
-      "triclip_name": "-",
-      "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"
-      ],
-      "indication": "Funkční mitrální regurgitace při ischemické KMP",
-      "location": "Komisura A1/P1"
-    },
-    {
-      "id": "IMP-2026-005",
-      "date": "2026-03-18",
-      "hospital": "Městská nemocnice Hůrka pod Ještědem",
-      "time_from": "11:30",
-      "time_to": "14:00",
-      "gender": "Muž",
-      "birth_date": "1961-12-05",
-      "mitraclip_name": "-",
-      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT) (T-SVOR-802-XT)",
-      "accessories": [
-        "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)",
-        "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120 (TSG-TRH-120)"
-      ],
-      "indication": "Těžká trikuspidální regurgitace při anuloektázii",
-      "location": "Anteroseptální komisura"
-    },
-    {
-      "id": "IMP-2026-006",
-      "date": "2026-04-12",
-      "hospital": "Fakultní kardio-pavilon Uhlohrad",
-      "time_from": "09:00",
-      "time_to": "11:45",
-      "gender": "Žena",
-      "birth_date": "1955-09-28",
-      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká) (SVOR-802-XTW)",
-      "triclip_name": "-",
-      "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"
-      ],
-      "indication": "Závažná mitrální regurgitace po AMI",
-      "location": "Segment P2/P3"
+      "birth_date": "1950-11-20",
+      "indication": "Funkční mitrální regurgitace (HFrEF)",
+      "location": "Segment A2–P2"
     },
     {
       "id": "IMP-2026-007",
-      "date": "2026-05-30",
-      "hospital": "FN Kamenice - Nový Lískovec",
-      "time_from": "13:30",
-      "time_to": "16:00",
-      "gender": "Muž",
-      "birth_date": "1966-02-18",
+      "date": "2026-07-15",
+      "time_from": "11:00",
+      "time_to": "12:40",
+      "hospital": "Fakultní kardio-pavilon Uhlohrad",
+      "hospitalId": 3,
+      "technicianId": 3,
       "mitraclip_name": "-",
-      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW) (T-SVOR-802-XTW)",
+      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW) (TRI-702-XTW)",
       "accessories": [
-        "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)"
+        "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)",
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)"
       ],
-      "indication": "Těžká symptomatická TR",
-      "location": "Posteroseptální komisura"
+      "gender": "Muž",
+      "birth_date": "1942-03-15",
+      "indication": "Těžká trikuspidální regurgitace",
+      "location": "Septální–anteriorní cíp"
     },
     {
-      "id": "IMP-2026-008",
-      "date": "2026-06-22",
-      "hospital": "Kardioinstitut Rybníček",
-      "time_from": "08:45",
-      "time_to": "11:30",
-      "gender": "Muž",
-      "birth_date": "1950-10-10",
+      "id": "IMP-2026-006",
+      "date": "2026-06-30",
+      "time_from": "08:00",
+      "time_to": "09:50",
+      "hospital": "FN Kamenice – Nový Lískovec",
+      "hospitalId": 2,
+      "technicianId": 1,
+      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká a Dlouhá) (SVOR-802-XTW)",
+      "triclip_name": "-",
+      "accessories": [
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)"
+      ],
+      "gender": "Žena",
+      "birth_date": "1953-08-04",
+      "indication": "Těžká degenerativní mitrální regurgitace",
+      "location": "Segment A3–P3"
+    },
+    {
+      "id": "IMP-2026-005",
+      "date": "2026-05-19",
+      "time_from": "12:30",
+      "time_to": "14:10",
+      "hospital": "Městská nemocnice Hůrka pod Ještědem",
+      "hospitalId": 4,
+      "technicianId": 1,
       "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá) (SVOR-802-XT)",
       "triclip_name": "-",
       "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)",
-        "Univerzální vodicí tubus 'Přímo do cíle' DS2C019 (TUBUS-2C019)"
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Trhací šlupkový zavaděč „Sloupni a jdi“ 405120 (TSG-TRH-120)"
       ],
-      "indication": "Sekundární MR se selháváním levé komory",
-      "location": "Segment A2/P2"
+      "gender": "Muž",
+      "birth_date": "1948-10-09",
+      "indication": "Prolaps zadního cípu mitrální chlopně",
+      "location": "Segment P2"
     },
     {
-      "id": "IMP-2026-009",
-      "date": "2026-07-19",
-      "hospital": "Městská nemocnice Hůrka pod Ještědem",
-      "time_from": "10:15",
-      "time_to": "12:45",
-      "gender": "Žena",
-      "birth_date": "1959-05-04",
+      "id": "IMP-2026-004",
+      "date": "2026-04-22",
+      "time_from": "10:00",
+      "time_to": "13:20",
+      "hospital": "Kardiocentrum Bradavice n. Nisou",
+      "hospitalId": 1,
+      "technicianId": 4,
       "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard) (SVOR-802-NT)",
+      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT) (TRI-702-XT)",
+      "accessories": [
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)",
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)"
+      ],
+      "gender": "Žena",
+      "birth_date": "1944-01-28",
+      "indication": "Kombinovaná mitrální a trikuspidální regurgitace",
+      "location": "A2–P2 / anteroseptální komisura"
+    },
+    {
+      "id": "IMP-2026-003",
+      "date": "2026-03-11",
+      "time_from": "09:15",
+      "time_to": "11:00",
+      "hospital": "Fakultní kardio-pavilon Uhlohrad",
+      "hospitalId": 3,
+      "technicianId": 3,
+      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká) (SVOR-802-NTW)",
       "triclip_name": "-",
       "accessories": [
-        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)"
       ],
-      "indication": "Degenerativní MR st. III-IV",
-      "location": "Segment A3/P3"
+      "gender": "Muž",
+      "birth_date": "1939-07-19",
+      "indication": "Funkční mitrální regurgitace (HFrEF)",
+      "location": "Segment A2–P2"
     },
     {
-      "id": "IMP-2026-010",
-      "date": "2026-08-14",
-      "hospital": "Fakultní kardio-pavilon Uhlohrad",
-      "time_from": "12:00",
-      "time_to": "14:30",
-      "gender": "Muž",
-      "birth_date": "1963-08-30",
+      "id": "IMP-2026-002",
+      "date": "2026-02-03",
+      "time_from": "13:00",
+      "time_to": "15:15",
+      "hospital": "FN Kamenice – Nový Lískovec",
+      "hospitalId": 2,
+      "technicianId": 1,
       "mitraclip_name": "-",
-      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XT) (T-SVOR-802-XT)",
+      "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč NTW) (TRI-702-NTW)",
       "accessories": [
         "Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)",
-        "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120 (TSG-TRH-120)"
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)",
+        "Trhací šlupkový zavaděč „Sloupni a jdi“ 405120 (TSG-TRH-120)"
       ],
-      "indication": "Symptomatická těžká tricuspidální regurgitace",
+      "gender": "Žena",
+      "birth_date": "1951-09-02",
+      "indication": "Těžká trikuspidální regurgitace",
       "location": "Anteroseptální komisura"
-    }
-  ],
-  "logs": [
-    {
-      "ts": "2026-09-30T15:06:00",
-      "event": "Přidána položka Sklad s dynamickým výběrem Nemocnic a Techníků",
-      "user": "AGY"
     },
     {
-      "ts": "2026-09-30T21:54:00",
-      "event": "Přidány implantace za rok 2026 a rozšířen číselník materiálu Svorky a Příslušenství",
-      "user": "AGY"
+      "id": "IMP-2026-001",
+      "date": "2026-01-14",
+      "time_from": "08:30",
+      "time_to": "10:45",
+      "hospital": "Kardiocentrum Bradavice n. Nisou",
+      "hospitalId": 1,
+      "technicianId": 2,
+      "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká a Dlouhá) (SVOR-802-XTW)",
+      "triclip_name": "-",
+      "accessories": [
+        "Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-RID-802)",
+        "Rozšiřovací dilatátor 24F „Prostor“ (DIL-24F-120)"
+      ],
+      "gender": "Muž",
+      "birth_date": "1946-04-12",
+      "indication": "Těžká degenerativní mitrální regurgitace",
+      "location": "Segment A2–P2"
     }
-  ]
+  ],
+  "logs": []
 }
