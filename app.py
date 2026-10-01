@@ -152,7 +152,24 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <div class="grid-card">
           <div class="card-header">
             <h3><i class="fa-solid fa-notes-medical"></i> Seznam Realizovaných Implantací</h3>
-            <button class="btn-primary btn-sm" onclick="openNewImplantationModal()"><i class="fa-solid fa-plus"></i> Nová implantace</button>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <select id="filter-imp-field" onchange="updateImpFilterOptions()" class="modal-input" style="padding: 7px 10px; width: 145px; font-size: 13px; margin:0;">
+                <option value="all">Filtruj vše</option>
+                <option value="hospital">Nemocnice</option>
+                <option value="mitraclip">MitraClip</option>
+                <option value="triclip">TriClip</option>
+                <option value="date">Datum implantace</option>
+                <option value="id">ID Implantace</option>
+              </select>
+
+              <div style="position: relative; display: flex; align-items: center;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i>
+                <input type="text" id="filter-imp-input" list="filter-imp-datalist" placeholder="Vyberte ze seznamu / zadejte..." oninput="filterImplantationsTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 220px; transition: all 0.2s;">
+                <datalist id="filter-imp-datalist"></datalist>
+              </div>
+
+              <button class="btn-primary btn-sm" onclick="openNewImplantationModal()"><i class="fa-solid fa-plus"></i> Nová implantace</button>
+            </div>
           </div>
           <div class="card-body">
             <div class="table-container">
@@ -252,7 +269,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         </div>
         <div class="form-group margin-bottom-sm">
           <label>E-mail</label>
-          <input type="email" id="tech-email" class="modal-input" placeholder="novak@cardion.cz">
+          <input type="email" id="tech-email" class="modal-input" placeholder="novak@vlasta-project.cz">
         </div>
         <div class="form-group margin-bottom-sm">
           <label>Telefon</label>
@@ -295,7 +312,7 @@ EMBEDDED_INDEX_HTML = """<!DOCTYPE html>
         <input type="hidden" id="hosp-id">
         <div class="form-group margin-bottom-sm">
           <label>Název Nemocnice / Kardiocentra</label>
-          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Brno Bohunice">
+          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Kamenice - Nový Lískovec">
         </div>
         <div class="form-group margin-bottom-sm">
           <label>Město</label>
@@ -593,7 +610,7 @@ function saveTechnicianModal() {
   const absence_from = document.getElementById('tech-absence-from').value;
   const absence_to = document.getElementById('tech-absence-to').value;
   if (!name) { alert('Zadejte prosím jméno technika.'); return; }
-  const itemData = { name, email: email || 'technik@cardion.cz', phone: phone || '+420 724 000 000', status, absence_from: status === 'Nepřítomnost' ? absence_from : '', absence_to: status === 'Nepřítomnost' ? absence_to : '' };
+  const itemData = { name, email: email || 'technik@vlasta-project.cz', phone: phone || '+420 724 000 000', status, absence_from: status === 'Nepřítomnost' ? absence_from : '', absence_to: status === 'Nepřítomnost' ? absence_to : '' };
   const action = techId ? 'edit' : 'add';
   fetch('/api/vlasta/codebooks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, type: 'technicians', id: techId ? parseInt(techId) : null, data: itemData }) })
   .then(r => r.json()).then(() => { closeTechnicianModal(); loadVlastaCodebooks(); });
@@ -691,7 +708,7 @@ function populateLocationDropdown(selectId, selectedValue = '') {
   if (!select) return;
   const hospitals = (vlastaData.codebooks && vlastaData.codebooks.hospitals) || [];
   const technicians = (vlastaData.codebooks && vlastaData.codebooks.technicians) || [];
-  let html = '<option value="Hlavní sklad CARDION">Hlavní sklad CARDION</option>';
+  let html = '<option value="Centrální sklad VLASTA">Centrální sklad VLASTA</option>';
   if (hospitals.length > 0) {
     html += '<optgroup label="🏥 Nemocnice & Kardiocentra">';
     hospitals.forEach(h => { if (h.name) html += `<option value="${h.name}">${h.name}</option>`; });
@@ -1119,28 +1136,28 @@ def load_db():
             "items": [],
             "codebooks": {
                 "technicians": [
-                    { "id": 1, "name": "Jaroslav Černý", "email": "jaroslav.cerny@cardion.cz", "phone": "+420 724 111 222", "status": "Aktivní", "absence_from": "", "absence_to": "" },
-                    { "id": 2, "name": "Martin Selingr", "email": "martin.selingr@cardion.cz", "phone": "+420 724 528 085", "status": "Nepřítomnost", "absence_from": "2026-10-01", "absence_to": "2026-10-15" },
-                    { "id": 3, "name": "Henio (Henryk Szymeczek)", "email": "henio@cardion.cz", "phone": "+420 724 333 444", "status": "Aktivní", "absence_from": "", "absence_to": "" },
-                    { "id": 4, "name": "Jakub Střítecký", "email": "jakub.stritecky@cardion.cz", "phone": "+420 724 555 666", "status": "Aktivní", "absence_from": "", "absence_to": "" }
+                    { "id": 1, "name": "Marek Dvořák", "email": "marek.dvorak@vlasta-project.cz", "phone": "+420 724 111 222", "status": "Aktivní", "absence_from": "", "absence_to": "" },
+                    { "id": 2, "name": "Tomáš Veselý", "email": "tomas.vesely@vlasta-project.cz", "phone": "+420 724 528 085", "status": "Nepřítomnost", "absence_from": "2026-10-01", "absence_to": "2026-10-15" },
+                    { "id": 3, "name": "Jindřich \"Jindra\" Blažek", "email": "jindrich.blazek@vlasta-project.cz", "phone": "+420 724 333 444", "status": "Aktivní", "absence_from": "", "absence_to": "" },
+                    { "id": 4, "name": "Jan Kovář", "email": "jan.kovar@vlasta-project.cz", "phone": "+420 724 555 666", "status": "Aktivní", "absence_from": "", "absence_to": "" }
                 ],
                 "hospitals": [
-                    { "id": 1, "name": "FN Brno Bohunice", "city": "Brno", "address": "Jihlavská 20, Brno", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" },
-                    { "id": 2, "name": "FN USA BRNO", "city": "Brno", "address": "Pekařská 53, Brno", "tender_start": "2026-03-01", "tender_duration_years": 2, "tender_end": "2028-03-01" },
-                    { "id": 3, "name": "IKEM Praha", "city": "Praha", "address": "Vídeňská 1958/9, Praha 4", "tender_start": "2025-06-01", "tender_duration_years": 4, "tender_end": "2029-06-01" },
-                    { "id": 4, "name": "FNsP Ostrava Poruba", "city": "Ostrava", "address": "17. listopadu 1790/5, Ostrava", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" }
+                    { "id": 1, "name": "FN Kamenice - Nový Lískovec", "city": "Kamenice", "address": "Kamenická 20, Kamenice", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" },
+                    { "id": 2, "name": "Městská nemocnice Hůrka pod Ještědem", "city": "Hůrka pod Ještědem", "address": "Podještědská 53, Hůrka pod Ještědem", "tender_start": "2026-03-01", "tender_duration_years": 2, "tender_end": "2028-03-01" },
+                    { "id": 3, "name": "Kardioinstitut Rybníček", "city": "Rybníček", "address": "Rybniční 1958/9, Rybníček", "tender_start": "2025-06-01", "tender_duration_years": 4, "tender_end": "2029-06-01" },
+                    { "id": 4, "name": "Fakultní kardio-pavilon Uhlohrad", "city": "Uhlohrad", "address": "Uhelná 1790/5, Uhlohrad", "tender_start": "2026-01-01", "tender_duration_years": 3, "tender_end": "2029-01-01" }
                 ],
                 "clip": [
-                    { "id": 1, "code": "CDS0802-XTW", "name": "MitraClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050755", "lot": "60402A1107", "ref": "CDS0802-XTW", "expiry": "2028-09-30" },
-                    { "id": 2, "code": "CDS0802-XT", "name": "MitraClip™ G5 Delivery System XT", "udi_di": "(01) 05415067050861", "lot": "60401A1072", "ref": "CDS0802-XT", "expiry": "2028-10-31" },
-                    { "id": 3, "code": "TCDS0802-XTW", "name": "TriClip™ G5 Delivery System XTW", "udi_di": "(01) 05415067050786", "lot": "60319R1082", "ref": "TCDS0802-XTW", "expiry": "2028-06-30" }
+                    { "id": 1, "code": "SVOR-802-XTW", "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká)", "udi_di": "(01) 00001234567890", "lot": "LOT9941X2026", "ref": "REF-M-802-XTW", "expiry": "2028-09-30" },
+                    { "id": 2, "code": "SVOR-802-XT", "name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)", "udi_di": "(01) 00001234567891", "lot": "LOT7723B2026", "ref": "REF-M-802-XT", "expiry": "2028-10-31" },
+                    { "id": 3, "code": "T-SVOR-802-XTW", "name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)", "udi_di": "(01) 00001234567892", "lot": "LOT5512C2026", "ref": "REF-T-802-XTW", "expiry": "2028-06-30" }
                 ],
                 "accessories": [
-                    { "id": 1, "code": "TSGC0802", "name": "TriClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050892", "lot": "60504R1045", "ref": "TSGC0802", "expiry": "2028-12-31" },
-                    { "id": 2, "code": "SGC0802", "name": "MitraClip™ G5 Steerable Guide Catheter", "udi_di": "(01) 05415067050823", "lot": "60317A2021", "ref": "SGC0802", "expiry": "2028-11-30" },
-                    { "id": 3, "code": "1458Q", "name": "Quartet™ 86 cm Elektroda", "udi_di": "(01) 05415067011224", "lot": "70123R2001", "ref": "1458Q-86", "expiry": "2029-01-31" },
-                    { "id": 4, "code": "405120", "name": "Peel-Away Introducer 405120", "udi_di": "(01) 05415067022335", "lot": "70211A3012", "ref": "PAI-405120", "expiry": "2028-08-31" },
-                    { "id": 5, "code": "DS2C019", "name": "CPS Direct™ Universal DS2C019", "udi_di": "(01) 05415067033446", "lot": "70315C1045", "ref": "DS2C019-U", "expiry": "2029-03-31" }
+                    { "id": 1, "code": "KAT-NAV-802", "name": "Zatáčecí navigační trubice na trojcíp (TSGC-G5)", "udi_di": "(01) 00001234567896", "lot": "LOT4490G2026", "ref": "REF-NAV-802", "expiry": "2028-12-31" },
+                    { "id": 2, "code": "KAT-MIT-802", "name": "Řiditelná vodicí hadička na mitrálku (SGC-G5)", "udi_di": "(01) 00001234567897", "lot": "LOT6681H2026", "ref": "REF-MIT-802", "expiry": "2028-11-30" },
+                    { "id": 3, "code": "STRUNA-86Q", "name": "Čtyřkvartetová napájecí struna 86 cm", "udi_di": "(01) 00001234567898", "lot": "LOT2273J2026", "ref": "REF-ELE-86Q", "expiry": "2029-01-31" },
+                    { "id": 4, "code": "TSG-TRH-120", "name": "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120", "udi_di": "(01) 00001234567899", "lot": "LOT9914K2026", "ref": "REF-ZAV-120", "expiry": "2028-08-31" },
+                    { "id": 5, "code": "TUBUS-2C019", "name": "Univerzální vodicí tubus 'Přímo do cíle' DS2C019", "udi_di": "(01) 00001234567900", "lot": "LOT8825L2026", "ref": "REF-TUB-019", "expiry": "2029-03-31" }
                 ]
             },
             "implantations": [],
@@ -1152,28 +1169,28 @@ def load_db():
             {
               "id": "IMP-2026-001",
               "date": "2026-09-28",
-              "hospital": "FNsP Ostrava Poruba",
+              "hospital": "Fakultní kardio-pavilon Uhlohrad",
               "time_from": "09:30",
               "time_to": "11:45",
               "gender": "Muž",
               "birth_date": "1958-04-12",
-              "mitraclip_name": "MitraClip™ G5 Delivery System XTW (CDS0802-XTW)",
+              "mitraclip_name": "Dvojcípá ventilová svorka G5 – podávací tyč (verze Široká) (SVOR-802-XTW)",
               "triclip_name": "-",
-              "accessories": ["MitraClip™ G5 Steerable Guide Catheter (SGC0802)"],
+              "accessories": ["Řiditelná vodicí hadička na mitrálku (SGC-G5) (KAT-MIT-802)"],
               "indication": "Těžká sekundární mitrální regurgitace st. IV",
               "location": "Segment A2/P2"
             },
             {
               "id": "IMP-2026-002",
               "date": "2026-09-29",
-              "hospital": "IKEM Praha",
+              "hospital": "Kardioinstitut Rybníček",
               "time_from": "13:00",
               "time_to": "15:15",
               "gender": "Žena",
               "birth_date": "1964-11-03",
               "mitraclip_name": "-",
-              "triclip_name": "TriClip™ G5 Delivery System XTW (TCDS0802-XTW)",
-              "accessories": ["TriClip™ G5 Steerable Guide Catheter (TSGC0802)", "Peel-Away Introducer 405120"],
+              "triclip_name": "Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW) (T-SVOR-802-XTW)",
+              "accessories": ["Zatáčecí navigační trubice na trojcíp (TSGC-G5) (KAT-NAV-802)", "Trhací šlupkový zavaděč 'Sloupni a jdi' 405120 (TSG-TRH-120)"],
               "indication": "Těžká trikuspidální regurgitace",
               "location": "Anteroseptální komisura"
             }
