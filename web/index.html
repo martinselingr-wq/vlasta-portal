@@ -54,10 +54,20 @@
 
 
       <div class="sidebar-footer">
+        <div class="user-profile-box" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+          <span style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">PŘIHLÁŠENÝ UŽIVATEL</span>
+          <div style="font-weight: 700; color: #fff; font-size: 14px; margin-top: 2px;">Tomáš Veselý</div>
+          <div style="color: var(--text-muted); font-size: 11px;">tomas.vesely@vlasta-project.cz</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+            <span style="background: rgba(6, 182, 212, 0.15); color: #38bdf8; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Administrátor</span>
+            <a href="#" onclick="alert('Uživatel přihlášen jako Administrátor'); return false;" style="color: var(--text-muted); font-size: 12px; text-decoration: none;"><i class="fa-solid fa-right-from-bracket"></i> Odhlásit</a>
+          </div>
+        </div>
         <div class="status-box">
           <span class="status-dot"></span>
           <span>VLASTA Engine: <strong>Aktivní</strong></span>
         </div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">Dvojcíp · Trojcíp G5 Logistika ČR</div>
       </div>
     </aside>
 
@@ -66,7 +76,7 @@
       <header class="top-header">
         <div class="header-left">
           <h1 id="page-title">Hlavní Přehled</h1>
-          <p class="page-subtitle" id="page-subtitle">Přehledná správa a řízení projektu VLASTA</p>
+          <p class="page-subtitle" id="page-subtitle">Stav logistiky Dvojcíp a Trojcíp v České republice</p>
         </div>
         <div class="header-actions">
           <div class="search-box">
@@ -81,50 +91,79 @@
 
       <!-- TAB 1: DASHBOARD -->
       <section class="tab-pane active" id="tab-dashboard">
-        <div class="stats-grid">
+        <!-- Top KPI 4 Cards Row -->
+        <div class="stats-grid-4">
           <div class="stat-card">
-            <div class="stat-icon icon-cyan"><i class="fa-solid fa-cubes"></i></div>
             <div class="stat-details">
-              <span class="stat-title">Celkem Položek</span>
-              <h3 id="stat-total-items">0</h3>
+              <span class="stat-title" style="letter-spacing: 0.5px; font-weight: 600;">KUSŮ NA SKLADĚ V ČR</span>
+              <h3 id="dash-total-qty" style="color: #38bdf8; font-size: 30px; font-weight: 700; margin-top: 4px;">56</h3>
             </div>
+            <div class="stat-icon icon-cyan" style="margin-left: auto; width: 44px; height: 44px; font-size: 18px;"><i class="fa-solid fa-cubes"></i></div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon icon-emerald"><i class="fa-solid fa-layer-group"></i></div>
             <div class="stat-details">
-              <span class="stat-title">Celkové Množství</span>
-              <h3 id="stat-total-qty">0 ks</h3>
+              <span class="stat-title" style="letter-spacing: 0.5px; font-weight: 600;">EXPIRACE DO 90 DNÍ</span>
+              <h3 id="dash-expiring-90" style="color: #f87171; font-size: 30px; font-weight: 700; margin-top: 4px;">19</h3>
             </div>
+            <div class="stat-icon icon-red" style="margin-left: auto; width: 44px; height: 44px; font-size: 18px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon icon-indigo"><i class="fa-solid fa-tags"></i></div>
             <div class="stat-details">
-              <span class="stat-title">Kategorie</span>
-              <h3 id="stat-categories-count">0</h3>
+              <span class="stat-title" style="letter-spacing: 0.5px; font-weight: 600;">IMPLANTACÍ 2026</span>
+              <h3 id="dash-imp-2026" style="color: #38bdf8; font-size: 30px; font-weight: 700; margin-top: 4px;">9</h3>
+            </div>
+            <div class="stat-icon icon-cyan" style="margin-left: auto; width: 44px; height: 44px; font-size: 18px;"><i class="fa-solid fa-heart-pulse"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-details">
+              <span class="stat-title" style="letter-spacing: 0.5px; font-weight: 600;">NEMOCNIC / TECHNIKŮ</span>
+              <h3 id="dash-hosp-tech" style="color: #38bdf8; font-size: 30px; font-weight: 700; margin-top: 4px;">4 / 4</h3>
+            </div>
+            <div class="stat-icon icon-cyan" style="margin-left: auto; width: 44px; height: 44px; font-size: 18px;"><i class="fa-solid fa-hospital-user"></i></div>
+          </div>
+        </div>
+
+        <!-- Section 1: Reorder Banner Card ("K doplnění – 4 položek pod minimálním stavem") -->
+        <div class="grid-card margin-top-lg" style="border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(20, 28, 46, 0.85);">
+          <div class="card-header" style="margin-bottom: 12px;">
+            <h3 style="color: #f59e0b; display: flex; align-items: center; gap: 8px; font-size: 15px;">
+              <i class="fa-solid fa-boxes-packing" style="color: #f59e0b;"></i>
+              <span id="reorder-header-text">K doplnění – 4 položek pod minimálním stavem</span>
+            </h3>
+            <a href="#" onclick="switchTab('items'); return false;" style="color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: none;">Sklad &rarr;</a>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="color: #64748b; font-size: 11px;">KÓD</th>
+                    <th style="color: #64748b; font-size: 11px;">NÁZEV</th>
+                    <th style="text-align: right; color: #64748b; font-size: 11px;">SKLADEM</th>
+                    <th style="text-align: right; color: #64748b; font-size: 11px;">MINIMUM</th>
+                    <th style="text-align: right; color: #64748b; font-size: 11px;">DOOBJEDNAT</th>
+                  </tr>
+                </thead>
+                <tbody id="reorder-items-body">
+                  <!-- Dynamic -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-        <div class="dashboard-grid margin-top-lg">
-          <div class="grid-card col-span-2">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-clock-rotate-left"></i> Poslední Přidané Záznamy</h3>
-              <button class="btn-secondary btn-sm" onclick="switchTab('items')">Zobrazit Vše</button>
+        <!-- Section 2: 2-Column Grid (Blížící se expirace & Poslední implantace) -->
+        <div class="dashboard-grid-2 margin-top-lg">
+          <!-- Left: Blížící se expirace -->
+          <div class="grid-card">
+            <div class="card-header" style="margin-bottom: 14px;">
+              <h3 style="font-size: 16px; font-weight: 700;">Blížící se expirace</h3>
+              <a href="#" onclick="switchTab('items'); return false;" style="color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: none;">Vše &rarr;</a>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="padding: 0;">
               <div class="table-container">
                 <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Kód</th>
-                      <th>Název</th>
-                      <th>Kategorie</th>
-                      <th>Množství</th>
-                      <th>Umovní / Sklad</th>
-                      <th>Stav</th>
-                    </tr>
-                  </thead>
-                  <tbody id="recent-items-body">
+                  <tbody id="expiring-items-body">
                     <!-- Dynamic -->
                   </tbody>
                 </table>
@@ -132,12 +171,42 @@
             </div>
           </div>
 
+          <!-- Right: Poslední implantace -->
           <div class="grid-card">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-chart-pie"></i> Rozpad Kategorií</h3>
+            <div class="card-header" style="margin-bottom: 14px;">
+              <h3 style="font-size: 16px; font-weight: 700;">Poslední implantace</h3>
+              <a href="#" onclick="switchTab('implantations'); return false;" style="color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: none;">Vše &rarr;</a>
             </div>
-            <div class="card-body">
-              <canvas id="categoryChart" height="200"></canvas>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="color: #64748b; font-size: 11px;">ID</th>
+                      <th style="color: #64748b; font-size: 11px;">DATUM</th>
+                      <th style="color: #64748b; font-size: 11px;">NEMOCNICE</th>
+                      <th style="color: #64748b; font-size: 11px;">SYSTÉM</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-implantations-body">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Zásoby u techniků Grid -->
+        <div class="grid-card margin-top-lg">
+          <div class="card-header" style="margin-bottom: 16px;">
+            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700;">
+              <i class="fa-solid fa-users" style="color: #38bdf8;"></i> Zásoby u techniků
+            </h3>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div id="tech-stock-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+              <!-- Dynamic technician inventory cards -->
             </div>
           </div>
         </div>
