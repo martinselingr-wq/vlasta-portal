@@ -5,12 +5,13 @@ window.switchTab = function(tabKey) {
   const pageSubtitle = document.getElementById('page-subtitle');
 
   const titlesMap = {
-    dashboard: { title: 'Hlavní Přehled', subtitle: 'Přehledná správa a řízení projektu VLASTA' },
+    dashboard: { title: 'Hlavní Přehled', subtitle: 'Stav logistiky Dvojcíp a Trojcíp v České republice' },
     items: { title: 'Evidované Položky', subtitle: 'Detailní seznam všech položek v databázi VLASTA' },
     implantations: { title: 'Implantace', subtitle: 'Evidence realizovaných zákroků MitraClip a TriClip' },
     codebooks: { title: 'Číselníky', subtitle: 'Správa kmenových dat: Technici, Nemocnice, Materiál, Příslušenství' },
     voice: { title: 'Hlasový Asistent Vlasta AI', subtitle: 'Zadávání a zpracování příkazů pomocí hlasového rozhraní' },
-    analytics: { title: 'Analytika & Statistiky', subtitle: 'Systémový rozpad dat a přehledy aktivních kategorií' }
+    analytics: { title: 'Analytika & Statistiky', subtitle: 'Systémový rozpad dat a přehledy aktivních kategorií' },
+    users: { title: 'Uživatelé & Účet', subtitle: 'Správa uživatelských účtů, rolí a přístupových oprávnění' }
   };
 
   navItems.forEach(i => {
@@ -33,6 +34,9 @@ window.switchTab = function(tabKey) {
   }
   if (tabKey === 'implantations') {
     loadImplantations();
+  }
+  if (tabKey === 'users') {
+    renderUsersTab();
   }
 };
 
@@ -116,7 +120,7 @@ function renderTechniciansTable(items) {
 
     html += `
       <tr>
-        <td>#${t.id}</td>
+        <td><strong>#TECH-${String(t.id).padStart(3, '0')}</strong></td>
         <td><strong>${t.name}</strong></td>
         <td>${t.email}</td>
         <td>${t.phone}</td>
@@ -248,7 +252,7 @@ function renderHospitalsTable(items) {
 
     html += `
       <tr>
-        <td>#${h.id}</td>
+        <td><strong>#NEM-${String(h.id).padStart(3, '0')}</strong></td>
         <td><strong>${h.name}</strong></td>
         <td>${h.city}</td>
         <td>${h.address}</td>
@@ -417,7 +421,7 @@ function renderClipTable(items) {
     const locBadge = c.location ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-solid fa-warehouse"></i> ${c.location}</span>` : '-';
     html += `
       <tr>
-        <td>#${c.id}</td>
+        <td><strong>#CLIP-${String(c.id).padStart(3, '0')}</strong></td>
         <td><strong>${c.code || '-'}</strong></td>
         <td>${c.name || '-'}</td>
         <td><span class="badge-vlasta">${c.udi_di || '-'}</span></td>
@@ -595,7 +599,7 @@ function renderAccessoriesTable(items) {
     const locBadge = a.location ? `<span style="color:#06b6d4; font-weight:600;"><i class="fa-solid fa-warehouse"></i> ${a.location}</span>` : '-';
     html += `
       <tr>
-        <td>#${a.id}</td>
+        <td><strong>#PRIS-${String(a.id).padStart(3, '0')}</strong></td>
         <td><strong>${a.code || '-'}</strong></td>
         <td>${a.name || '-'}</td>
         <td><span class="badge-vlasta">${a.udi_di || '-'}</span></td>
@@ -870,8 +874,10 @@ function renderReorderTable(rawItems) {
   reorderList.forEach(r => {
     const toOrder = Math.max(1, r.min - r.quantity);
     html += `
-      <tr>
-        <td><strong style="color: #38bdf8;">${r.code}</strong></td>
+      <tr style="cursor: pointer;" onclick="openStockItemDetailModal('${r.code}')">
+        <td>
+          <a href="#" onclick="openStockItemDetailModal('${r.code}'); return false;" style="color: #38bdf8; font-weight: 700; text-decoration: underline;">${r.code}</a>
+        </td>
         <td>${r.name}</td>
         <td style="text-align: right; font-weight: 600; color: #f87171;">${r.quantity} ks</td>
         <td style="text-align: right; color: #94a3b8;">${r.min} ks</td>
@@ -898,8 +904,10 @@ function renderExpiringTable(rawItems) {
 
   expiringItems.forEach(i => {
     html += `
-      <tr>
-        <td><strong style="color: #38bdf8;">${i.code || '-'}</strong></td>
+      <tr style="cursor: pointer;" onclick="openStockItemDetailModal('${i.code}')">
+        <td>
+          <a href="#" onclick="openStockItemDetailModal('${i.code}'); return false;" style="color: #38bdf8; font-weight: 700; text-decoration: underline;">${i.code || '-'}</a>
+        </td>
         <td style="max-width: 200px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${i.name || '-'}</td>
         <td style="color: #ef4444; font-weight: 700; text-align: right;">${i.expiry}</td>
         <td style="text-align: right;">
@@ -1123,6 +1131,10 @@ function renderItemsTable() {
     filteredGroups = filteredGroups.filter(g => g.expiring90Qty > 0);
   }
 
+  if (filterUnderMinOnly) {
+    filteredGroups = filteredGroups.filter(g => g.totalQty < 5);
+  }
+
   // Sort by shortest expiration date ascending (nearest expiry on top)
   filteredGroups.sort((a, b) => {
     const expA = a.expiries.length > 0 ? a.expiries.slice().sort()[0] : '9999-12-31';
@@ -1269,10 +1281,275 @@ function processVlastaVoiceCommand() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  updateUserUI();
   loadVlastaData();
   loadVlastaCodebooks();
   loadImplantations();
 });
+
+// =============================================================================
+// USER AUTHENTICATION, ROLES & PERMISSIONS SYSTEM
+// =============================================================================
+
+const VLASTA_USERS = [
+  { id: 'USR-001', name: 'Tomáš Veselý', email: 'tomas.vesely@vlasta-project.cz', role: 'Administrátor' },
+  { id: 'USR-002', name: 'Jan Kovář', email: 'jan.kovar@vlasta-project.cz', role: 'Skladník' },
+  { id: 'USR-003', name: 'Marek Dvořák', email: 'marek.dvorak@vlasta-project.cz', role: 'Technik' },
+  { id: 'USR-004', name: 'Jindřich "Jindra" Blažek', email: 'jindrich.blazek@vlasta-project.cz', role: 'Lékař' }
+];
+
+function getStoredUsers() {
+  const saved = localStorage.getItem('vlasta_users_db');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return VLASTA_USERS;
+}
+
+function saveUsers(users) {
+  localStorage.setItem('vlasta_users_db', JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  const email = localStorage.getItem('vlasta_logged_user_email') || 'tomas.vesely@vlasta-project.cz';
+  const users = getStoredUsers();
+  return users.find(u => u.email.toLowerCase() === email.toLowerCase()) || users[0];
+}
+
+function selectUserLogin(email) {
+  localStorage.setItem('vlasta_logged_user_email', email);
+  updateUserUI();
+  closeLoginModal();
+  if (typeof switchTab === 'function') switchTab('dashboard');
+  alert(`Byl jste úspěšně přihlášen jako ${getCurrentUser().name} (${getCurrentUser().role})`);
+}
+
+function loginCustomUser() {
+  const input = document.getElementById('custom-login-email');
+  const email = input ? input.value.trim() : '';
+  if (!email) { alert('Zadejte platný e-mail.'); return; }
+  
+  const users = getStoredUsers();
+  let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (!user) {
+    const namePart = email.split('@')[0].replace('.', ' ');
+    const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    user = {
+      id: `USR-${String(users.length + 1).padStart(3, '0')}`,
+      name: formattedName,
+      email: email,
+      role: 'Lékař'
+    };
+    users.push(user);
+    saveUsers(users);
+  }
+  selectUserLogin(user.email);
+}
+
+function openLoginModal() {
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeLoginModal() {
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function updateUserUI() {
+  const curUser = getCurrentUser();
+  const nameEl = document.getElementById('sidebar-user-name');
+  const emailEl = document.getElementById('sidebar-user-email');
+  const roleEl = document.getElementById('sidebar-user-role');
+  
+  if (nameEl) nameEl.textContent = curUser.name;
+  if (emailEl) emailEl.textContent = curUser.email;
+  if (roleEl) roleEl.textContent = curUser.role;
+
+  const tabName = document.getElementById('user-tab-name');
+  const tabEmail = document.getElementById('user-tab-email');
+  const tabRole = document.getElementById('user-tab-role');
+
+  if (tabName) tabName.textContent = curUser.name;
+  if (tabEmail) tabEmail.textContent = curUser.email;
+  if (tabRole) tabRole.textContent = curUser.role;
+
+  updateRoleUI();
+}
+
+function hasPermission(permKey) {
+  const role = getCurrentUser().role;
+  if (role === 'Administrátor') return true;
+  
+  if (role === 'Skladník') {
+    return ['items_add', 'items_edit', 'items_delete', 'codebooks_edit', 'items_view', 'implantations_view'].includes(permKey);
+  }
+  if (role === 'Technik') {
+    return ['implantations_add', 'implantations_edit', 'items_view', 'codebooks_view'].includes(permKey);
+  }
+  if (role === 'Lékař') {
+    return ['items_view', 'implantations_view', 'analytics_view', 'voice_view'].includes(permKey);
+  }
+  return false;
+}
+
+function updateRoleUI() {
+  const canAddItem = hasPermission('items_add');
+  const canAddImp = hasPermission('implantations_add');
+
+  const btnAddItem = document.getElementById('btn-add-item-stock');
+  if (btnAddItem) btnAddItem.style.display = canAddItem ? 'inline-flex' : 'none';
+
+  const btnAddImp = document.getElementById('btn-add-imp');
+  if (btnAddImp) btnAddImp.style.display = canAddImp ? 'inline-flex' : 'none';
+}
+
+function renderUsersTab() {
+  const tbody = document.getElementById('users-list-body');
+  if (!tbody) return;
+
+  const users = getStoredUsers();
+  const curUser = getCurrentUser();
+
+  let html = '';
+  users.forEach(u => {
+    const isCurrent = u.email.toLowerCase() === curUser.email.toLowerCase();
+    const activeBadge = isCurrent 
+      ? `<span style="color:#10b981; font-weight:700; font-size:11px; margin-left:8px;">(Aktivní vy)</span>` 
+      : '';
+
+    const isAdmin = curUser.role === 'Administrátor';
+    let roleSelect = '';
+    
+    if (isAdmin && !isCurrent) {
+      roleSelect = `
+        <select class="modal-input" onchange="changeUserRole('${u.id}', this.value)" style="padding: 4px 8px; font-size: 12px; margin: 0; width: 140px;">
+          <option value="Administrátor" ${u.role === 'Administrátor' ? 'selected' : ''}>Administrátor</option>
+          <option value="Skladník" ${u.role === 'Skladník' ? 'selected' : ''}>Skladník</option>
+          <option value="Technik" ${u.role === 'Technik' ? 'selected' : ''}>Technik</option>
+          <option value="Lékař" ${u.role === 'Lékař' ? 'selected' : ''}>Lékař</option>
+        </select>
+      `;
+    } else {
+      const colors = { 'Administrátor': '#38bdf8', 'Skladník': '#f59e0b', 'Technik': '#c084fc', 'Lékař': '#94a3b8' };
+      roleSelect = `<span style="color:${colors[u.role] || '#fff'}; font-weight:700;">${u.role}</span>`;
+    }
+
+    html += `
+      <tr>
+        <td><strong>${u.id}</strong></td>
+        <td><strong>${u.name}</strong> ${activeBadge}</td>
+        <td><code>${u.email}</code></td>
+        <td>${roleSelect}</td>
+        <td><span class="badge-vlasta">${u.role === 'Administrátor' ? 'Plná oprávnění' : (u.role === 'Skladník' ? 'Správa skladu & číselníků' : (u.role === 'Technik' ? 'Zákroky & Sklad' : 'Pouze čtení'))}</span></td>
+        <td style="text-align: right;">
+          <button class="btn-secondary btn-sm" onclick="selectUserLogin('${u.email}')"><i class="fa-solid fa-right-to-bracket"></i> Přihlásit se</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function changeUserRole(userId, newRole) {
+  const users = getStoredUsers();
+  const target = users.find(u => u.id === userId);
+  if (target) {
+    target.role = newRole;
+    saveUsers(users);
+    renderUsersTab();
+    updateUserUI();
+    alert(`Role uživatele ${target.name} byla změněna na ${newRole}.`);
+  }
+}
+
+// STOCK ITEM DETAIL MODAL & POD MINIMEM FILTER
+let filterUnderMinOnly = false;
+
+function toggleUnderMinFilter() {
+  filterUnderMinOnly = !filterUnderMinOnly;
+  const btn = document.getElementById('btn-filter-undermin');
+  if (btn) {
+    if (filterUnderMinOnly) {
+      btn.style.background = 'rgba(245, 158, 11, 0.2)';
+      btn.style.borderColor = '#f59e0b';
+      btn.innerHTML = `<i class="fa-solid fa-filter-circle-xmark"></i> Zobrazit Vše`;
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      btn.innerHTML = `<i class="fa-solid fa-boxes-packing"></i> Pod minimem`;
+    }
+  }
+  renderItemsTable();
+}
+
+function openStockItemDetailModal(code) {
+  const modal = document.getElementById('stock-item-detail-modal');
+  const title = document.getElementById('stock-item-detail-title');
+  const body = document.getElementById('stock-item-detail-body');
+  if (!modal || !body) return;
+
+  const rawItems = getAllRawItems();
+  const matched = rawItems.filter(i => (i.code || '').toUpperCase() === (code || '').toUpperCase());
+
+  if (matched.length === 0) {
+    alert(`Položka s kódem ${code} nebyla nalezena.`);
+    return;
+  }
+
+  const sample = matched[0];
+  const totalQty = matched.reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
+  
+  const locationsMap = {};
+  matched.forEach(i => {
+    const loc = i.location || 'Centrální sklad';
+    locationsMap[loc] = (locationsMap[loc] || 0) + (parseInt(i.quantity) || 1);
+  });
+
+  const locListHtml = Object.entries(locationsMap).map(([loc, q]) => 
+    `<li style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>${loc}</span> <strong style="color:#38bdf8;">${q} ks</strong></li>`
+  ).join('');
+
+  if (title) title.innerHTML = `<i class="fa-solid fa-box-open" style="color:#06b6d4;"></i> Detail Položky Skladu: <strong style="color:#38bdf8;">${sample.code}</strong>`;
+
+  body.innerHTML = `
+    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;">
+      <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;">${sample.name}</div>
+      <div style="display: flex; gap: 15px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap;">
+        <span>Kód: <strong style="color:#38bdf8;">${sample.code}</strong></span>
+        <span>UDI-DI: <code style="color:#06b6d4;">${sample.udi_di || '-'}</code></span>
+        <span>LOT: <code>${sample.lot || '-'}</code></span>
+        <span>REF: <code>${sample.ref || '-'}</code></span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+      <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <span style="color: var(--text-muted); font-size: 12px;">Celková zásoba v ČR:</span>
+        <div style="font-size: 24px; font-weight: 700; color: #38bdf8; margin-top: 4px;">${totalQty} ks</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <span style="color: var(--text-muted); font-size: 12px;">Exspirace (Nejbližší):</span>
+        <div style="font-size: 20px; font-weight: 700; color: #f87171; margin-top: 4px;">${sample.expiry || '-'}</div>
+      </div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <span style="color: var(--text-muted); font-size: 12px; font-weight: 600;">Rozpad zásoby podle skladů a techniků:</span>
+      <ul style="list-style: none; padding: 0; margin-top: 8px; font-size: 13px;">
+        ${locListHtml}
+      </ul>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+function closeStockItemDetailModal() {
+  const modal = document.getElementById('stock-item-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
 
 // IMPLANTATIONS LOGIC
 function loadImplantations() {
