@@ -50,17 +50,21 @@
           <i class="fa-solid fa-chart-line"></i>
           <span>Analytika &amp; Statistiky</span>
         </button>
+        <button class="nav-item" data-tab="users" onclick="switchTab('users')">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Uživatelé &amp; Účet</span>
+        </button>
       </nav>
 
 
       <div class="sidebar-footer">
-        <div class="user-profile-box" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+        <div class="user-profile-box" id="sidebar-user-box" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
           <span style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">PŘIHLÁŠENÝ UŽIVATEL</span>
-          <div style="font-weight: 700; color: #fff; font-size: 14px; margin-top: 2px;">Tomáš Veselý</div>
-          <div style="color: var(--text-muted); font-size: 11px;">tomas.vesely@vlasta-project.cz</div>
+          <div id="sidebar-user-name" style="font-weight: 700; color: #fff; font-size: 14px; margin-top: 2px;">Tomáš Veselý</div>
+          <div id="sidebar-user-email" style="color: var(--text-muted); font-size: 11px;">tomas.vesely@vlasta-project.cz</div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-            <span style="background: rgba(6, 182, 212, 0.15); color: #38bdf8; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Administrátor</span>
-            <a href="#" onclick="alert('Uživatel přihlášen jako Administrátor'); return false;" style="color: var(--text-muted); font-size: 12px; text-decoration: none;"><i class="fa-solid fa-right-from-bracket"></i> Odhlásit</a>
+            <span id="sidebar-user-role" style="background: rgba(6, 182, 212, 0.15); color: #38bdf8; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Administrátor</span>
+            <a href="#" onclick="openLoginModal(); return false;" style="color: #f87171; font-size: 12px; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-right-from-bracket"></i> Odhlásit</a>
           </div>
         </div>
         <div class="status-box">
@@ -231,7 +235,8 @@
                 <datalist id="filter-items-datalist"></datalist>
               </div>
               <button class="btn-danger btn-sm" id="btn-filter-expiry90" onclick="toggleExpiry90Filter()"><i class="fa-solid fa-triangle-exclamation"></i> Expirace 90 dní</button>
-              <button class="btn-primary btn-sm" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
+              <button class="btn-secondary btn-sm" id="btn-filter-undermin" style="color:#f59e0b; border-color:rgba(245, 158, 11, 0.4);" onclick="toggleUnderMinFilter()"><i class="fa-solid fa-boxes-packing"></i> Pod minimem</button>
+              <button class="btn-primary btn-sm" id="btn-add-item-stock" onclick="showAddItemModal()"><i class="fa-solid fa-plus"></i> Přidat Novou Položku</button>
             </div>
           </div>
           <div class="card-body">
@@ -508,7 +513,98 @@
             <h3><i class="fa-solid fa-chart-line"></i> Systémová Analytika VLASTA</h3>
           </div>
           <div class="card-body">
-            <p>Systém VLASTA běží na dedikovaném REST API a čisté MCP vrstvě. Zde se budou zobrazovat pokročilé agregace a přehledy.</p>
+            <p>Systém VLASTA běží na dedikovaném REST API a čisté MCP vrstvě. Zde se zobrazují systémové metriky, zásoby a agregace.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: USERS & ROLES -->
+      <section class="tab-pane" id="tab-users">
+        <div class="grid-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-user-shield"></i> Správa Uživatelů, Účtů a Oprávnění</h3>
+            <button class="btn-primary btn-sm" onclick="openLoginModal()"><i class="fa-solid fa-right-to-bracket"></i> Přepnout Účet / Přihlásit</button>
+          </div>
+          <div class="card-body">
+            <div id="active-user-banner" style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3); padding: 16px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #06b6d4, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">
+                  <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 16px; color: white;" id="user-tab-name">Tomáš Veselý</div>
+                  <div style="color: var(--text-muted); font-size: 13px;" id="user-tab-email">tomas.vesely@vlasta-project.cz</div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span id="user-tab-role" style="background: rgba(6, 182, 212, 0.2); color: #38bdf8; font-size: 12px; padding: 4px 12px; border-radius: 6px; font-weight: 700;">Administrátor</span>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Aktivní relace v prohlížeči</div>
+              </div>
+            </div>
+
+            <h4 style="color: white; margin-bottom: 12px; font-size: 15px;"><i class="fa-solid fa-users"></i> Seznam registrovaných účtů a přiřazených rolí</h4>
+            <div class="table-container" style="margin-bottom: 24px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Uživatel</th>
+                    <th>Jméno a Příjmení</th>
+                    <th>E-mail (Doména vlasta-project.cz)</th>
+                    <th>Přiřazená Role</th>
+                    <th>Oprávnění</th>
+                    <th style="text-align: right;">Akce</th>
+                  </tr>
+                </thead>
+                <tbody id="users-list-body">
+                  <!-- Dynamic user list -->
+                </tbody>
+              </table>
+            </div>
+
+            <h4 style="color: white; margin-bottom: 12px; font-size: 15px;"><i class="fa-solid fa-shield-halved"></i> Přehled matice oprávnění podle rolí</h4>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Role</th>
+                    <th>Sklad (Položky)</th>
+                    <th>Implantace</th>
+                    <th>Číselníky</th>
+                    <th>Správa Uživatelů</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong style="color: #38bdf8;">👑 Administrátor</strong></td>
+                    <td><span style="color:#10b981;">Plný přístup (Čtení/Zápis/Mazání)</span></td>
+                    <td><span style="color:#10b981;">Plný přístup (Čtení/Zápis/Mazání)</span></td>
+                    <td><span style="color:#10b981;">Plný přístup</span></td>
+                    <td><span style="color:#10b981;">Ano</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color: #f59e0b;">📦 Skladník</strong></td>
+                    <td><span style="color:#10b981;">Plný přístup (Čtení/Zápis/Mazání)</span></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#10b981;">Správa materiálů a cliplů</span></td>
+                    <td><span style="color:#ef4444;">Ne</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color: #a855f7;">🩺 Technik</strong></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#10b981;">Přidávání a úprava zákroků</span></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#ef4444;">Ne</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color: #64748b;">🏥 Lékař</strong></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#38bdf8;">Pouze čtení</span></td>
+                    <td><span style="color:#ef4444;">Ne</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -804,6 +900,83 @@
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeNewImplantationModal()">Zrušit</button>
         <button class="btn-primary" onclick="saveNewImplantation()"><i class="fa-solid fa-check"></i> Uložit a Odepsat ze Skladu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN / USER SWITCH -->
+  <div id="login-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-shield" style="color:#06b6d4;"></i> Přihlášení do Systému VLASTA</h3>
+        <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+          Vyberte uživatelský účet pro simulaci přihlášení s příslušnými oprávněními (Administrátor, Skladník, Technik, Lékař):
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <button onclick="selectUserLogin('tomas.vesely@vlasta-project.cz')" class="btn-secondary" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-color: rgba(6,182,212,0.4); text-align: left;">
+            <div>
+              <div style="font-weight: 700; color: white;">👑 Tomáš Veselý</div>
+              <div style="font-size: 11px; color: var(--text-muted);">tomas.vesely@vlasta-project.cz</div>
+            </div>
+            <span style="background: rgba(6,182,212,0.2); color: #38bdf8; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Administrátor</span>
+          </button>
+
+          <button onclick="selectUserLogin('jan.kovar@vlasta-project.cz')" class="btn-secondary" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-color: rgba(245,158,11,0.4); text-align: left;">
+            <div>
+              <div style="font-weight: 700; color: white;">📦 Jan Kovář</div>
+              <div style="font-size: 11px; color: var(--text-muted);">jan.kovar@vlasta-project.cz</div>
+            </div>
+            <span style="background: rgba(245,158,11,0.2); color: #f59e0b; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Skladník</span>
+          </button>
+
+          <button onclick="selectUserLogin('marek.dvorak@vlasta-project.cz')" class="btn-secondary" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-color: rgba(168,85,247,0.4); text-align: left;">
+            <div>
+              <div style="font-weight: 700; color: white;">🩺 Marek Dvořák</div>
+              <div style="font-size: 11px; color: var(--text-muted);">marek.dvorak@vlasta-project.cz</div>
+            </div>
+            <span style="background: rgba(168,85,247,0.2); color: #c084fc; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Technik</span>
+          </button>
+
+          <button onclick="selectUserLogin('jindrich.blazek@vlasta-project.cz')" class="btn-secondary" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-color: rgba(100,116,139,0.4); text-align: left;">
+            <div>
+              <div style="font-weight: 700; color: white;">🏥 Jindřich "Jindra" Blažek</div>
+              <div style="font-size: 11px; color: var(--text-muted);">jindrich.blazek@vlasta-project.cz</div>
+            </div>
+            <span style="background: rgba(100,116,139,0.2); color: #94a3b8; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Lékař</span>
+          </button>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); pt-3; margin-top: 15px; padding-top: 15px;">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Nebo se přihlaste jiným e-mailem s doménou @vlasta-project.cz:</div>
+          <div style="display: flex; gap: 8px;">
+            <input type="email" id="custom-login-email" class="modal-input" placeholder="vase.jmeno@vlasta-project.cz" style="flex: 1;">
+            <button class="btn-primary" onclick="loginCustomUser()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Přihlásit</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeLoginModal()">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: STOCK ITEM DETAIL -->
+  <div id="stock-item-detail-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="stock-item-detail-title"><i class="fa-solid fa-box-open" style="color:#06b6d4;"></i> Detail Položky Skladu</h3>
+        <button class="modal-close" onclick="closeStockItemDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="stock-item-detail-body">
+        <!-- Dynamic -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeStockItemDetailModal()">Zavřít</button>
+        <button class="btn-primary" onclick="switchTab('items'); closeStockItemDetailModal();"><i class="fa-solid fa-arrow-right"></i> Přejít do Skladu</button>
       </div>
     </div>
   </div>
