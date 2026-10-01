@@ -781,8 +781,14 @@ function getAllRawItems() {
   const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || vlastaData.accessories || [];
   
   const raw = [
-    ...clipList.map(i => ({ ...i, category: 'Clip', quantity: parseInt(i.quantity) || 1 })),
-    ...accList.map(i => ({ ...i, category: 'Příslušenství', quantity: parseInt(i.quantity) || 1 }))
+    ...clipList.map(i => {
+      const totalQty = i.allocations ? i.allocations.reduce((s, a) => s + (parseInt(a.qty) || 0), 0) : (parseInt(i.quantity) || 1);
+      return { ...i, category: 'Clip', quantity: totalQty, minStock: i.minStock || 4 };
+    }),
+    ...accList.map(i => {
+      const totalQty = i.allocations ? i.allocations.reduce((s, a) => s + (parseInt(a.qty) || 0), 0) : (parseInt(i.quantity) || 1);
+      return { ...i, category: 'Příslušenství', quantity: totalQty, minStock: i.minStock || 4 };
+    })
   ];
   return raw;
 }
@@ -792,7 +798,7 @@ function renderDashboardStats() {
   const today = new Date('2026-10-01');
 
   // 1. Top Cards
-  const totalQty = rawItems.reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
+  const totalQty = rawItems.reduce((acc, i) => acc + (parseInt(i.quantity) || 0), 0);
 
   let expiring90Count = 0;
   rawItems.forEach(i => {
@@ -801,7 +807,7 @@ function renderDashboardStats() {
       if (!isNaN(expDate.getTime())) {
         const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
         if (diffDays <= 90) {
-          expiring90Count += (parseInt(i.quantity) || 1);
+          expiring90Count += (parseInt(i.quantity) || 0);
         }
       }
     }
@@ -841,27 +847,33 @@ function renderReorderTable(rawItems) {
   const tbody = document.getElementById('reorder-items-body');
   if (!tbody) return;
 
-  const grouped = {};
-  rawItems.forEach(i => {
-    const code = i.code || i.name || 'UNKN';
-    if (!grouped[code]) {
-      grouped[code] = {
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+  const allItems = [...clipList, ...accList];
+
+  let reorderList = [];
+  allItems.forEach(i => {
+    const totalQty = i.allocations ? i.allocations.reduce((s, a) => s + (parseInt(a.qty) || 0), 0) : (parseInt(i.quantity) || 1);
+    const min = i.minStock || 5;
+    if (totalQty < min) {
+      reorderList.push({
+        id: i.id,
+        kind: i.kind || (i.category === 'Příslušenství' ? 'accessory' : 'clip'),
         code: i.code || '-',
         name: i.name || '-',
-        quantity: 0,
-        min: 6
-      };
+        quantity: totalQty,
+        min: min,
+        needed: min - totalQty
+      });
     }
-    grouped[code].quantity += (parseInt(i.quantity) || 1);
   });
 
-  let reorderList = Object.values(grouped).filter(g => g.quantity < g.min);
   if (reorderList.length === 0) {
     reorderList = [
-      { code: 'SVOR-802-XT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)', quantity: 4, min: 6 },
-      { code: 'SVOR-802-NT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)', quantity: 3, min: 5 },
-      { code: 'KAT-NAV-802', name: 'Zatáčecí navigační trubice na trojcíp (TSGC-G5)', quantity: 4, min: 6 },
-      { code: 'T-SVOR-802-XTW', name: 'Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)', quantity: 3, min: 4 }
+      { id: 1, kind: 'clip', code: 'SVOR-802-XT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)', quantity: 4, min: 6, needed: 2 },
+      { id: 3, kind: 'clip', code: 'SVOR-802-NT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)', quantity: 3, min: 5, needed: 2 },
+      { id: 9, kind: 'accessory', code: 'KAT-NAV-802', name: 'Zatáčecí navigační trubice na trojcíp (TSGC-G5)', quantity: 4, min: 6, needed: 2 },
+      { id: 6, kind: 'clip', code: 'TRI-702-XTW', name: 'Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)', quantity: 3, min: 4, needed: 1 }
     ];
   }
 
@@ -872,9 +884,10 @@ function renderReorderTable(rawItems) {
 
   let html = '';
   reorderList.forEach(r => {
-    const toOrder = Math.max(1, r.min - r.quantity);
+    const itemNoStr = r.kind === 'accessory' ? `PRIS-${String(r.id).padStart(3, '0')}` : `CLIP-${String(r.id).padStart(3, '0')}`;
     html += `
       <tr style="cursor: pointer;" onclick="openStockItemDetailModal('${r.code}')">
+        <td style="color:#64748b; font-size:12px; font-family:monospace; font-weight:600;">${itemNoStr}</td>
         <td>
           <a href="#" onclick="openStockItemDetailModal('${r.code}'); return false;" style="color: #38bdf8; font-weight: 700; text-decoration: underline;">${r.code}</a>
         </td>
@@ -882,7 +895,7 @@ function renderReorderTable(rawItems) {
         <td style="text-align: right; font-weight: 600; color: #f87171;">${r.quantity} ks</td>
         <td style="text-align: right; color: #94a3b8;">${r.min} ks</td>
         <td style="text-align: right;">
-          <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 12px;">+${toOrder} ks</span>
+          <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 12px;">+${r.needed} ks</span>
         </td>
       </tr>
     `;
@@ -903,8 +916,10 @@ function renderExpiringTable(rawItems) {
   }
 
   expiringItems.forEach(i => {
+    const itemNoStr = i.kind === 'accessory' ? `PRIS-${String(i.id).padStart(3, '0')}` : `CLIP-${String(i.id).padStart(3, '0')}`;
     html += `
       <tr style="cursor: pointer;" onclick="openStockItemDetailModal('${i.code}')">
+        <td style="color:#64748b; font-size:12px; font-family:monospace; font-weight:600;">${itemNoStr}</td>
         <td>
           <a href="#" onclick="openStockItemDetailModal('${i.code}'); return false;" style="color: #38bdf8; font-weight: 700; text-decoration: underline;">${i.code || '-'}</a>
         </td>
@@ -954,30 +969,36 @@ function renderTechStockGrid(rawItems, technicians) {
   const grid = document.getElementById('tech-stock-grid');
   if (!grid) return;
 
-  const regionMap = {
-    'Marek Dvořák': 'Region Uhlohrad',
-    'Tomáš Veselý': 'Region Kamenice',
-    'Jindřich "Jindra" Blažek': 'Region Hůrka',
-    'Jan Kovář': 'Region Bradavice'
-  };
-
   const techList = (technicians && technicians.length > 0) ? technicians : [
-    { name: 'Jan Kovář' },
-    { name: 'Tomáš Veselý' },
-    { name: 'Marek Dvořák' },
-    { name: 'Jindřich "Jindra" Blažek' }
+    { name: 'Jan Kovář', region: 'Region Kamenice' },
+    { name: 'Petra Šťastná', region: 'Region Bradavice' },
+    { name: 'Marek Dvořák', region: 'Region Uhlohrad' },
+    { name: 'Jindřich „Jindra“ Blažek', region: 'Region Hůrka' }
   ];
+
+  const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || [];
+  const accList = (vlastaData.codebooks && vlastaData.codebooks.accessories) || [];
+  const allItems = [...clipList, ...accList];
 
   let html = '';
   techList.forEach(t => {
     const name = t.name || 'Technik';
-    const region = regionMap[name] || `Region ${name.split(' ')[0]}`;
+    const region = t.region || `Region ${name.split(' ')[0]}`;
 
-    let techQty = rawItems.filter(i => (i.location || '').toLowerCase().includes(name.toLowerCase()))
-                            .reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
+    let techQty = 0;
+    allItems.forEach(item => {
+      if (item.allocations && Array.isArray(item.allocations)) {
+        item.allocations.forEach(a => {
+          if (a.location && a.location.toLowerCase().includes(name.toLowerCase())) {
+            techQty += (parseInt(a.qty) || 0);
+          }
+        });
+      }
+    });
+
     if (!techQty) {
       if (name.includes('Kovář')) techQty = 5;
-      else if (name.includes('Veselý')) techQty = 3;
+      else if (name.includes('Šťastná')) techQty = 1;
       else if (name.includes('Dvořák')) techQty = 2;
       else if (name.includes('Blažek')) techQty = 2;
       else techQty = 2;
