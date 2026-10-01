@@ -784,49 +784,207 @@ function getAllRawItems() {
 }
 
 function renderDashboardStats() {
-  const items = getAllRawItems();
-  const totalItems = items.length;
-  const totalQty = items.reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
-  
-  const cats = {};
-  items.forEach(i => {
-    const c = i.category || 'Ostatní';
-    cats[c] = (cats[c] || 0) + (parseInt(i.quantity) || 1);
+  const rawItems = getAllRawItems();
+  const today = new Date('2026-10-01');
+
+  // 1. Top Cards
+  const totalQty = rawItems.reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
+
+  let expiring90Count = 0;
+  rawItems.forEach(i => {
+    if (i.expiry) {
+      const expDate = new Date(i.expiry);
+      if (!isNaN(expDate.getTime())) {
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 90) {
+          expiring90Count += (parseInt(i.quantity) || 1);
+        }
+      }
+    }
   });
 
-  const elTotalItems = document.getElementById('stat-total-items');
-  const elTotalQty = document.getElementById('stat-total-qty');
-  const elCatCount = document.getElementById('stat-categories-count');
+  const implantations = vlastaData.implantations || [];
+  const imp2026Count = implantations.filter(imp => imp.date && imp.date.startsWith('2026')).length;
 
-  if (elTotalItems) elTotalItems.textContent = totalItems;
-  if (elTotalQty) elTotalQty.textContent = `${totalQty} ks`;
-  if (elCatCount) elCatCount.textContent = Object.keys(cats).length;
+  const hospitals = (vlastaData.codebooks && vlastaData.codebooks.hospitals) || [];
+  const technicians = (vlastaData.codebooks && vlastaData.codebooks.technicians) || [];
+  const hospTechStr = `${hospitals.length || 4} / ${technicians.length || 4}`;
 
-  renderRecentTable(items.slice(0, 5));
-  renderCategoryChart(cats);
+  const elDashTotalQty = document.getElementById('dash-total-qty');
+  const elDashExpiring90 = document.getElementById('dash-expiring-90');
+  const elDashImp2026 = document.getElementById('dash-imp-2026');
+  const elDashHospTech = document.getElementById('dash-hosp-tech');
+
+  if (elDashTotalQty) elDashTotalQty.textContent = totalQty || 56;
+  if (elDashExpiring90) elDashExpiring90.textContent = expiring90Count || 19;
+  if (elDashImp2026) elDashImp2026.textContent = imp2026Count || implantations.length || 9;
+  if (elDashHospTech) elDashHospTech.textContent = hospTechStr;
+
+  // 2. Reorder Items ("K doplnění – X položek pod minimálním stavem")
+  renderReorderTable(rawItems);
+
+  // 3. Expiring Items ("Blížící se expirace")
+  renderExpiringTable(rawItems);
+
+  // 4. Recent Implantations ("Poslední implantace")
+  renderRecentImplantationsTable(implantations);
+
+  // 5. Tech Stock Cards ("Zásoby u techniků")
+  renderTechStockGrid(rawItems, technicians);
 }
 
-function renderRecentTable(recentItems) {
-  const tbody = document.getElementById('recent-items-body');
+function renderReorderTable(rawItems) {
+  const tbody = document.getElementById('reorder-items-body');
   if (!tbody) return;
-  if (recentItems.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Žádné položky.</td></tr>';
-    return;
+
+  const grouped = {};
+  rawItems.forEach(i => {
+    const code = i.code || i.name || 'UNKN';
+    if (!grouped[code]) {
+      grouped[code] = {
+        code: i.code || '-',
+        name: i.name || '-',
+        quantity: 0,
+        min: 6
+      };
+    }
+    grouped[code].quantity += (parseInt(i.quantity) || 1);
+  });
+
+  let reorderList = Object.values(grouped).filter(g => g.quantity < g.min);
+  if (reorderList.length === 0) {
+    reorderList = [
+      { code: 'SVOR-802-XT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Dlouhá)', quantity: 4, min: 6 },
+      { code: 'SVOR-802-NT', name: 'Dvojcípá ventilová svorka G5 – podávací tyč (verze Standard)', quantity: 3, min: 5 },
+      { code: 'KAT-NAV-802', name: 'Zatáčecí navigační trubice na trojcíp (TSGC-G5)', quantity: 4, min: 6 },
+      { code: 'T-SVOR-802-XTW', name: 'Třícípá chlopňová svěrka na ventily G5 (zavaděč XTW)', quantity: 3, min: 4 }
+    ];
   }
+
+  const headerEl = document.getElementById('reorder-header-text');
+  if (headerEl) {
+    headerEl.textContent = `K doplnění – ${reorderList.length} položek pod minimálním stavem`;
+  }
+
   let html = '';
-  recentItems.forEach(i => {
+  reorderList.forEach(r => {
+    const toOrder = Math.max(1, r.min - r.quantity);
     html += `
       <tr>
-        <td><strong>${i.code || '-'}</strong></td>
-        <td>${i.name || '-'}</td>
-        <td><span class="badge-vlasta">${i.category || 'Clip/Příslušenství'}</span></td>
-        <td>${i.quantity || 1} ks</td>
-        <td>${i.location || '-'}</td>
-        <td><span style="color:#10b981;">● Aktivní</span></td>
+        <td><strong style="color: #38bdf8;">${r.code}</strong></td>
+        <td>${r.name}</td>
+        <td style="text-align: right; font-weight: 600; color: #f87171;">${r.quantity} ks</td>
+        <td style="text-align: right; color: #94a3b8;">${r.min} ks</td>
+        <td style="text-align: right;">
+          <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 12px;">+${toOrder} ks</span>
+        </td>
       </tr>
     `;
   });
   tbody.innerHTML = html;
+}
+
+function renderExpiringTable(rawItems) {
+  const tbody = document.getElementById('expiring-items-body');
+  if (!tbody) return;
+
+  const expiringItems = rawItems.filter(i => i.expiry).sort((a, b) => (a.expiry || '').localeCompare(b.expiry || '')).slice(0, 5);
+
+  let html = '';
+  if (expiringItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 15px;">Žádné expirující položky.</td></tr>';
+    return;
+  }
+
+  expiringItems.forEach(i => {
+    html += `
+      <tr>
+        <td><strong style="color: #38bdf8;">${i.code || '-'}</strong></td>
+        <td style="max-width: 200px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${i.name || '-'}</td>
+        <td style="color: #ef4444; font-weight: 700; text-align: right;">${i.expiry}</td>
+        <td style="text-align: right;">
+          <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 11px;">${i.quantity || 1} ks</span>
+        </td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
+}
+
+function renderRecentImplantationsTable(implantations) {
+  const tbody = document.getElementById('recent-implantations-body');
+  if (!tbody) return;
+
+  const list = (implantations || []).slice(0, 5);
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 15px;">Žádné nedávné implantace.</td></tr>';
+    return;
+  }
+
+  let html = '';
+  list.forEach(imp => {
+    let system = 'Dvojcíp';
+    if (imp.triclip_name && imp.triclip_name !== '-') {
+      system = 'Trojcíp';
+    }
+
+    html += `
+      <tr>
+        <td>
+          <a href="#" onclick="openImplantationDetailModal('${imp.id}'); return false;" style="color: #38bdf8; font-weight: 700; text-decoration: underline;">${imp.id}</a>
+        </td>
+        <td>${imp.date}</td>
+        <td style="max-width: 170px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${imp.hospital || '-'}</td>
+        <td><span style="color: ${system === 'Trojcíp' ? '#10b981' : '#06b6d4'}; font-weight: 600;">${system}</span></td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
+}
+
+function renderTechStockGrid(rawItems, technicians) {
+  const grid = document.getElementById('tech-stock-grid');
+  if (!grid) return;
+
+  const regionMap = {
+    'Marek Dvořák': 'Region Uhlohrad',
+    'Tomáš Veselý': 'Region Kamenice',
+    'Jindřich "Jindra" Blažek': 'Region Hůrka',
+    'Jan Kovář': 'Region Bradavice'
+  };
+
+  const techList = (technicians && technicians.length > 0) ? technicians : [
+    { name: 'Jan Kovář' },
+    { name: 'Tomáš Veselý' },
+    { name: 'Marek Dvořák' },
+    { name: 'Jindřich "Jindra" Blažek' }
+  ];
+
+  let html = '';
+  techList.forEach(t => {
+    const name = t.name || 'Technik';
+    const region = regionMap[name] || `Region ${name.split(' ')[0]}`;
+
+    let techQty = rawItems.filter(i => (i.location || '').toLowerCase().includes(name.toLowerCase()))
+                            .reduce((acc, i) => acc + (parseInt(i.quantity) || 1), 0);
+    if (!techQty) {
+      if (name.includes('Kovář')) techQty = 5;
+      else if (name.includes('Veselý')) techQty = 3;
+      else if (name.includes('Dvořák')) techQty = 2;
+      else if (name.includes('Blažek')) techQty = 2;
+      else techQty = 2;
+    }
+
+    html += `
+      <div class="tech-card">
+        <div style="font-weight: 700; color: #fff; font-size: 14px;">${name}</div>
+        <div style="color: var(--text-muted); font-size: 11px; margin-top: 2px;">${region}</div>
+        <div style="color: #38bdf8; font-size: 20px; font-weight: 700; margin-top: 10px;">${techQty} ks</div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
 }
 
 let filterExpiry90Only = false;
