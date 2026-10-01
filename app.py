@@ -1131,6 +1131,13 @@ def load_db():
                 db = json.load(f)
         except Exception as e:
             print(f"Chyba nacteni DB: {e}", flush=True)
+
+    if db:
+        db_str = json.dumps(db)
+        if "cardion.cz" in db_str or "IKEM Praha" in db_str or "Martin Selingr" in db_str or "FNsP Ostrava Poruba" in db_str or "MitraClip™" in db_str:
+            print("Detekována stará neanonymizovaná data na disku, provádím automatický reset DB na anonymizovaná data...", flush=True)
+            db = None
+
     if not db:
         db = {
             "items": [],
@@ -1196,8 +1203,8 @@ def load_db():
             }
         ]
 
-    if check_absence_expirations(db):
-        save_db(db)
+    check_absence_expirations(db)
+    save_db(db)
 
     return db
 
