@@ -79,6 +79,7 @@ function loadVlastaCodebooks() {
     updateClipFilterOptions(false);
     updateAccFilterOptions(false);
     updateItemsFilterOptions(false);
+    updateImpFilterOptions(false);
     renderItemsTable();
     renderImplantationsTable();
     renderDashboardStats();
@@ -191,7 +192,7 @@ function saveTechnicianModal() {
 
   const itemData = {
     name,
-    email: email || 'technik@cardion.cz',
+    email: email || 'technik@vlasta-project.cz',
     phone: phone || '+420 724 000 000',
     status,
     absence_from: status === 'Nepřítomnost' ? absence_from : '',
@@ -378,7 +379,7 @@ function populateLocationDropdown(selectId, selectedValue = '') {
   const hospitals = (vlastaData.codebooks && vlastaData.codebooks.hospitals) || [];
   const technicians = (vlastaData.codebooks && vlastaData.codebooks.technicians) || [];
 
-  let html = '<option value="Hlavní sklad CARDION">Hlavní sklad CARDION</option>';
+  let html = '<option value="Centrální sklad VLASTA">Centrální sklad VLASTA</option>';
 
   if (hospitals.length > 0) {
     html += '<optgroup label="🏥 Nemocnice & Kardiocentra">';
@@ -1123,7 +1124,7 @@ function loadImplantations() {
     if (data && data.implantations) {
       vlastaData.implantations = data.implantations;
     }
-    renderImplantationsTable();
+    updateImpFilterOptions(false);
   })
   .catch(err => {
     console.error('Chyba při načítání implantací:', err);
@@ -1131,11 +1132,90 @@ function loadImplantations() {
   });
 }
 
-function renderImplantationsTable() {
+function updateImpFilterOptions(resetInput = true) {
+  const field = document.getElementById('filter-imp-field')?.value || 'all';
+  const inputEl = document.getElementById('filter-imp-input');
+  const datalist = document.getElementById('filter-imp-datalist');
+  const impList = vlastaData.implantations || [];
+  
+  if (resetInput && inputEl) {
+    inputEl.value = '';
+    const placeholders = {
+      all: 'Vyberte ze seznamu / zadejte...',
+      hospital: 'Vyberte nebo zadejte Nemocnici...',
+      mitraclip: 'Vyberte nebo zadejte MitraClip...',
+      triclip: 'Vyberte nebo zadejte TriClip...',
+      date: 'Vyberte nebo zadejte Datum...',
+      id: 'Vyberte nebo zadejte ID...'
+    };
+    inputEl.placeholder = placeholders[field] || 'Vyberte ze seznamu / zadejte...';
+  }
+
+  if (!datalist) return;
+
+  const optionsSet = new Set();
+  impList.forEach(imp => {
+    if (field === 'hospital' && imp.hospital) optionsSet.add(imp.hospital);
+    else if (field === 'mitraclip' && imp.mitraclip_name && imp.mitraclip_name !== '-') optionsSet.add(imp.mitraclip_name);
+    else if (field === 'triclip' && imp.triclip_name && imp.triclip_name !== '-') optionsSet.add(imp.triclip_name);
+    else if (field === 'date' && imp.date) optionsSet.add(imp.date);
+    else if (field === 'id' && imp.id) optionsSet.add(imp.id);
+    else if (field === 'all') {
+      if (imp.hospital) optionsSet.add(imp.hospital);
+      if (imp.mitraclip_name && imp.mitraclip_name !== '-') optionsSet.add(imp.mitraclip_name);
+      if (imp.triclip_name && imp.triclip_name !== '-') optionsSet.add(imp.triclip_name);
+      if (imp.id) optionsSet.add(imp.id);
+      if (imp.date) optionsSet.add(imp.date);
+    }
+  });
+
+  let optionsHtml = '';
+  optionsSet.forEach(opt => {
+    optionsHtml += `<option value="${opt}"></option>`;
+  });
+  datalist.innerHTML = optionsHtml;
+
+  filterImplantationsTable();
+}
+
+function filterImplantationsTable() {
+  const field = document.getElementById('filter-imp-field')?.value || 'all';
+  const q = (document.getElementById('filter-imp-input')?.value || '').toLowerCase().trim();
+  const rawList = vlastaData.implantations || [];
+  
+  if (!q) {
+    renderImplantationsTable(rawList);
+    return;
+  }
+
+  const filtered = rawList.filter(imp => {
+    if (field === 'hospital') return imp.hospital && imp.hospital.toLowerCase().includes(q);
+    if (field === 'mitraclip') return imp.mitraclip_name && imp.mitraclip_name.toLowerCase().includes(q);
+    if (field === 'triclip') return imp.triclip_name && imp.triclip_name.toLowerCase().includes(q);
+    if (field === 'date') return imp.date && imp.date.toLowerCase().includes(q);
+    if (field === 'id') return imp.id && imp.id.toLowerCase().includes(q);
+    
+    const accStr = (imp.accessories || []).join(' ').toLowerCase();
+    return (
+      (imp.id && imp.id.toLowerCase().includes(q)) ||
+      (imp.date && imp.date.toLowerCase().includes(q)) ||
+      (imp.hospital && imp.hospital.toLowerCase().includes(q)) ||
+      (imp.mitraclip_name && imp.mitraclip_name.toLowerCase().includes(q)) ||
+      (imp.triclip_name && imp.triclip_name.toLowerCase().includes(q)) ||
+      (imp.indication && imp.indication.toLowerCase().includes(q)) ||
+      (imp.location && imp.location.toLowerCase().includes(q)) ||
+      accStr.includes(q)
+    );
+  });
+
+  renderImplantationsTable(filtered);
+}
+
+function renderImplantationsTable(itemsToRender = null) {
   const tbody = document.getElementById('implantations-table-body');
   if (!tbody) return;
 
-  const list = vlastaData.implantations || [];
+  const list = itemsToRender !== null ? itemsToRender : (vlastaData.implantations || []);
   if (list.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Žádné realizované implantace.</td></tr>';
     return;
@@ -1361,20 +1441,20 @@ function openNewImplantationModal() {
   });
   hospSelect.innerHTML = hospHtml;
 
-  // Populate MitraClip
+  // Populate MitraClip (Dvojcípá svorka)
   const mitraclipSelect = document.getElementById('imp-mitraclip');
   const clipList = (vlastaData.codebooks && (vlastaData.codebooks.clip || vlastaData.codebooks.material)) || vlastaData.clip || [];
-  let mitraHtml = '<option value="">-- Žádný MitraClip --</option>';
-  clipList.filter(c => c.name.toLowerCase().includes('mitraclip') || c.code.toLowerCase().includes('cds')).forEach(c => {
+  let mitraHtml = '<option value="">-- Žádná Dvojcípá svorka (MitraClip) --</option>';
+  clipList.filter(c => c.name.toLowerCase().includes('dvojcípá') || c.name.toLowerCase().includes('mitraclip') || c.code.toLowerCase().includes('svor')).forEach(c => {
     const qty = parseInt(c.quantity) || 1;
     mitraHtml += `<option value="${c.id}">${c.name} (Kód: ${c.code}, Sklad: ${c.location}, Skupina: ${qty} ks)</option>`;
   });
   mitraclipSelect.innerHTML = mitraHtml;
 
-  // Populate TriClip
+  // Populate TriClip (Třícípá svěrka)
   const triclipSelect = document.getElementById('imp-triclip');
-  let triHtml = '<option value="">-- Žádný TriClip --</option>';
-  clipList.filter(c => c.name.toLowerCase().includes('triclip') || c.code.toLowerCase().includes('tcds')).forEach(c => {
+  let triHtml = '<option value="">-- Žádná Třícípá svěrka (TriClip) --</option>';
+  clipList.filter(c => c.name.toLowerCase().includes('třícípá') || c.name.toLowerCase().includes('triclip') || c.code.toLowerCase().includes('t-svor')).forEach(c => {
     const qty = parseInt(c.quantity) || 1;
     triHtml += `<option value="${c.id}">${c.name} (Kód: ${c.code}, Sklad: ${c.location}, Skupina: ${qty} ks)</option>`;
   });
@@ -1480,14 +1560,14 @@ function saveNewImplantation() {
       .then(r => r.json())
       .then(res => {
         closeNewImplantationModal();
-        renderImplantationsTable();
+        updateImpFilterOptions(false);
         renderDashboardStats();
         alert(`Záznam implantace ${editId} byl úspěšně upraven!`);
       })
       .catch(err => {
         console.error('Chyba při úpravě implantace:', err);
         closeNewImplantationModal();
-        renderImplantationsTable();
+        updateImpFilterOptions(false);
       });
       return;
     }
@@ -1544,7 +1624,7 @@ function saveNewImplantation() {
   .then(r => r.json())
   .then(res => {
     closeNewImplantationModal();
-    renderImplantationsTable();
+    updateImpFilterOptions(false);
     renderItemsTable();
     renderClipTable(vlastaData.codebooks.clip || []);
     renderAccessoriesTable(vlastaData.codebooks.accessories || []);
@@ -1554,7 +1634,7 @@ function saveNewImplantation() {
   .catch(err => {
     console.error('Chyba při ukládání implantace:', err);
     closeNewImplantationModal();
-    renderImplantationsTable();
+    updateImpFilterOptions(false);
     renderItemsTable();
     renderDashboardStats();
   });
@@ -1569,11 +1649,11 @@ function deleteImplantation(impId) {
     body: JSON.stringify({ id: impId })
   })
   .then(() => {
-    renderImplantationsTable();
+    updateImpFilterOptions(false);
   })
   .catch(err => {
     console.error(err);
-    renderImplantationsTable();
+    updateImpFilterOptions(false);
   });
 }
 
