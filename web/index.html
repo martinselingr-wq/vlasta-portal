@@ -194,7 +194,24 @@
         <div class="grid-card">
           <div class="card-header">
             <h3><i class="fa-solid fa-notes-medical"></i> Seznam Realizovaných Implantací</h3>
-            <button class="btn-primary btn-sm" onclick="openNewImplantationModal()"><i class="fa-solid fa-plus"></i> Nová implantace</button>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <select id="filter-imp-field" onchange="updateImpFilterOptions()" class="modal-input" style="padding: 7px 10px; width: 145px; font-size: 13px; margin:0;">
+                <option value="all">Filtruj vše</option>
+                <option value="hospital">Nemocnice</option>
+                <option value="mitraclip">MitraClip</option>
+                <option value="triclip">TriClip</option>
+                <option value="date">Datum implantace</option>
+                <option value="id">ID Implantace</option>
+              </select>
+
+              <div style="position: relative; display: flex; align-items: center;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--accent-cyan); font-size: 12px; pointer-events: none;"></i>
+                <input type="text" id="filter-imp-input" list="filter-imp-datalist" placeholder="Vyberte ze seznamu / zadejte..." oninput="filterImplantationsTable()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 10px 7px 30px; color: white; outline: none; font-size: 13px; width: 220px; transition: all 0.2s;">
+                <datalist id="filter-imp-datalist"></datalist>
+              </div>
+
+              <button class="btn-primary btn-sm" onclick="openNewImplantationModal()"><i class="fa-solid fa-plus"></i> Nová implantace</button>
+            </div>
           </div>
           <div class="card-body">
             <div class="table-container">
@@ -444,7 +461,7 @@
         </div>
         <div class="form-group margin-bottom-sm">
           <label for="tech-email">E-mail</label>
-          <input type="email" id="tech-email" class="modal-input" placeholder="novak@cardion.cz">
+          <input type="email" id="tech-email" class="modal-input" placeholder="novak@vlasta-project.cz">
         </div>
         <div class="form-group margin-bottom-sm">
           <label for="tech-phone">Telefon</label>
@@ -488,15 +505,15 @@
         <input type="hidden" id="hosp-id">
         <div class="form-group margin-bottom-sm">
           <label for="hosp-name">Název Nemocnice / Kardiocentra</label>
-          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Brno Bohunice">
+          <input type="text" id="hosp-name" class="modal-input" placeholder="např. FN Kamenice - Nový Lískovec">
         </div>
         <div class="form-group margin-bottom-sm">
           <label for="hosp-city">Město</label>
-          <input type="text" id="hosp-city" class="modal-input" placeholder="např. Brno">
+          <input type="text" id="hosp-city" class="modal-input" placeholder="např. Kamenice">
         </div>
         <div class="form-group margin-bottom-sm">
           <label for="hosp-address">Adresa</label>
-          <input type="text" id="hosp-address" class="modal-input" placeholder="např. Jihlavská 20, Brno">
+          <input type="text" id="hosp-address" class="modal-input" placeholder="např. Kamenická 20, Kamenice">
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div class="form-group margin-bottom-sm">
